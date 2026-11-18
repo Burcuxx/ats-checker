@@ -1065,33 +1065,82 @@ const STOP = new Set((
   "team role position candidate required requirements preferred plus etc including such using use " +
   "who what where when about into within across their they them it its must should would looking join " +
   "bachelor bachelors degree master masters fluent fluency native lisans mezun mezunu ehliyet " +
-  "bölüm bölümü bölümünden sınıf sınıfı ingilizce almanca fransızca english german french spanish licence license"
+  "bölüm bölümü bölümünden sınıf sınıfı ingilizce almanca fransızca english german french spanish licence license " +
+  "hands-on proactive overall least e.g i.e eg ie etc principles ability abilities mindset passionate motivated self-starter " +
+  "detail-oriented solid deep familiarity familiar understanding environment fast-paced dynamic opportunity opportunities " +
+  "responsibilities responsible ensure various multiple great nice bonus ideally similar related relevant equivalent " +
+  "across closely help helping make making build building well also other new more most best like based level high " +
+  "company product products users user business customers clients client day days part full time remote hybrid office "
 ).split(" ").map(fold));
 
-function tokenize(s) {
-  return lower(s).replace(/[^\p{L}\p{N}+#./\s-]/gu, " ").split(/\s+/)
+/* Bilinen beceriler: ilanda bir kez geçse bile anahtar kelime sayılır.
+   Her satır: görünen ad | CV'de eşleşen yazımlar (eşanlamlılar) */
+const SKILLS = `
+javascript|javascript,es6 ; typescript|typescript ; react|react,react.js,reactjs ; react native ; next.js|next.js,nextjs ;
+vue|vue,vue.js,vuejs ; angular ; svelte ; node.js|node.js,nodejs,node ; express|express,express.js ; html|html,html5 ; css|css,css3 ;
+sass|sass,scss ; tailwind|tailwind,tailwindcss ; bootstrap ; redux ; zustand ; graphql ; rest api|rest api,rest apis,restful ;
+jquery ; webpack ; vite ; babel ; jest ; vitest ; cypress ; playwright ; testing library ; unit testing|unit testing,unit tests,unit test ;
+e2e testing|e2e,end-to-end ; integration testing|integration testing,integration tests ; testing|testing,tests,test ;
+debugging|debugging,debug ; troubleshooting|troubleshooting,troubleshoot ; accessibility|accessibility,a11y,wcag ;
+pwa|pwa,progressive web app ; responsive design|responsive ; mobile-first|mobile-first,mobile first ; web vitals|web vitals,core web vitals ;
+lighthouse ; performance optimization|performance optimization,performance optimisation,optimized performance,optimised performance ;
+git ; github ; gitlab ; bitbucket ; github actions ; ci/cd|ci/cd,ci cd,cicd,continuous integration,continuous delivery,continuous deployment ;
+devops ; docker ; kubernetes|kubernetes,k8s ; aws ; azure ; gcp|gcp,google cloud ; firebase ; vercel ; netlify ; linux ;
+python ; java ; c#|c# ; .net|.net,dotnet ; asp.net ; php ; laravel ; ruby ; rails ; golang ; rust ; kotlin ; swift ; flutter ;
+sql ; postgresql|postgresql,postgres ; mysql ; mongodb ; redis ; elasticsearch ; kafka ; microservices ;
+figma ; storybook ; design system|design system,design systems ; agile ; scrum ; kanban ; jira ; confluence ; tdd ;
+code review|code review,code reviews ; monorepo ; i18n|i18n,internationalization,localization ; websocket|websocket,websockets ;
+oauth ; jwt ; ux ; ui ; a/b testing|a/b testing,a/b tests,ab testing ; seo ; google analytics|google analytics,ga4 ;
+google tag manager|google tag manager,gtm ; semrush ; ahrefs ; screaming frog ; search console ; wordpress ; cms ; shopify ;
+hubspot ; salesforce ; excel ; power bi ; tableau ; machine learning ; data analysis ; project management ; stakeholder management ;
+proje yönetimi
+`.split(";").map((x) => x.trim()).filter(Boolean).map((x) => {
+  const [name, alts] = x.split("|").map((y) => y.trim());
+  return { name, alts: (alts ? alts.split(",") : [name]).map((y) => fold(y.trim())) };
+}).sort((a, b) => b.name.length - a.name.length);
+
+const reEsc = (x) => x.replace(/[.*+?^${}()|[\]\\\/]/g, "\\$&");
+// Kelime sınırıyla ara: "java" ≠ "javascript", "ui" ≠ "build"
+const hasTerm = (hay, term) => new RegExp("(^|[^\\p{L}\\p{N}])" + reEsc(term) + "($|[^\\p{L}\\p{N}])", "u").test(hay);
+
+function tokenize(s, locale) {
+  const low = (w) => (locale === "tr" ? w.toLocaleLowerCase("tr") : w.toLowerCase());
+  return low(s).replace(/[^\p{L}\p{N}+#./\s-]/gu, " ").split(/\s+/)
     .map((w) => w.replace(/^[.\-/]+|[.\-/]+$/g, ""))
-    .filter((w) => w.length > 1 && !STOP.has(fold(w)) && !/^\d+$/.test(w));
+    .filter((w) => w.length > 1 && !STOP.has(fold(w)) && !/^\d+$/.test(w) && !/^[a-z]\.[a-z]$/.test(w));
 }
 
 function matchKeywords(jd, cvLower) {
-  const toks = tokenize(jd);
+  const jdF = fold(jd);
+  const terms = []; // { name, alts, score }
+  // 1) Bilinen beceriler (uzundan kısaya: "react native" bulunursa "react" ayrıca eklenmez)
+  for (const sk of SKILLS) {
+    if (!sk.alts.some((a) => hasTerm(jdF, a))) continue;
+    // Yalnızca bütün kelime olarak içeriliyorsa atla ("react native" → "react" atlanır; "github actions" → "git" atlanmaz)
+    if (terms.some((t) => hasTerm(t.name, sk.name))) continue;
+    const n = (jdF.match(new RegExp(reEsc(sk.alts[0]), "g")) || []).length;
+    terms.push({ name: sk.name, alts: sk.alts, score: 10 + n });
+  }
+  // 2) Diğer sık kelimeler: en az 2 kez geçenler (tek geçen sıradan kelimeleri ele)
+  const toks = tokenize(jd, detectLang(jd));
   const freq = new Map();
   toks.forEach((t) => freq.set(t, (freq.get(t) || 0) + 1));
-  // İki kelimelik ifadeler (ör. "keyword research") 2+ kez geçiyorsa tek kelimelerden önce gelir
   for (let i = 0; i < toks.length - 1; i++) { const bi = toks[i] + " " + toks[i + 1]; freq.set(bi, (freq.get(bi) || 0) + 1); }
   const ranked = [...freq.entries()]
-    .filter(([k, v]) => (k.includes(" ") ? v >= 2 : k.length > 2))
+    .filter(([k, v]) => v >= 2 && k.length > 2)
     .map(([k, v]) => [k, k.includes(" ") ? v * 1.5 : v])
     .sort((a, b) => b[1] - a[1]);
-  const picked = [];
-  for (const [k] of ranked) {
-    if (picked.length >= 30) break;
-    if (picked.some((p) => p.includes(k) || k.includes(p))) continue;
-    picked.push(k);
+  for (const [k, v] of ranked) {
+    if (terms.length >= 30) break;
+    const f = fold(k);
+    if (terms.some((t) => t.alts.some((a) => a.includes(f) || f.includes(a)) || fold(t.name).includes(f) || f.includes(fold(t.name)))) continue;
+    terms.push({ name: k, alts: [f], score: v });
   }
-  const has = (k) => { const f = fold(k); return cvLower.includes(f) || (f.length > 6 && !f.includes(" ") && cvLower.includes(f.slice(0, 5))); };
-  const found = picked.filter(has), missing = picked.filter((k) => !has(k));
+  terms.sort((a, b) => b.score - a.score);
+  const picked = terms.slice(0, 30);
+  // Türkçe ekler için: uzun tek kelimelerde ilk 5 harf yeterli
+  const has = (t) => t.alts.some((a) => hasTerm(cvLower, a) || (a.length > 6 && !a.includes(" ") && cvLower.includes(a.slice(0, 5))));
+  const found = picked.filter(has).map((t) => t.name), missing = picked.filter((t) => !has(t)).map((t) => t.name);
   return { found, missing, pct: picked.length ? Math.round((found.length / picked.length) * 100) : 0 };
 }
 
