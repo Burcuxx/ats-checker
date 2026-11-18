@@ -1,9 +1,9 @@
 <!doctype html>
-<html lang="tr">
+<html lang="en">
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>ATS CV Kontrol</title>
+<title>ATS CV Checker</title>
 <link rel="preconnect" href="https://fonts.googleapis.com" />
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
 <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
@@ -603,9 +603,9 @@ const I18N = {
   },
 };
 
-let LANG = "tr";
-try { LANG = localStorage.getItem("ats-lang") || ((navigator.language || "tr").startsWith("tr") ? "tr" : "en"); } catch (e) {}
-if (!I18N[LANG]) LANG = "tr";
+let LANG = "en"; // Varsayılan dil İngilizce; kullanıcı TR seçerse tercihi hatırlanır
+try { LANG = localStorage.getItem("ats-lang") || "en"; } catch (e) {}
+if (!I18N[LANG]) LANG = "en";
 const T = () => I18N[LANG];
 
 function applyI18n() {
