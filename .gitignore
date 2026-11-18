@@ -1,0 +1,5 @@
+# Kişisel dosyalar — yayınlanmaz
+cv-onizleme/
+*.png
+.claude/
+.DS_Store

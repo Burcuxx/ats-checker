@@ -1,0 +1,1205 @@
+<!doctype html>
+<html lang="tr">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>ATS CV Kontrol</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/mammoth/1.6.0/mammoth.browser.min.js"></script>
+<style>
+:root {
+  --bg: #f5f6fb; --bg-2: #eef0fa; --card: #ffffff; --text: #151a2d; --muted: #687089; --faint: #9aa1b5;
+  --border: #e4e7f1; --accent: #4f46e5; --accent-2: #7c3aed; --accent-soft: #eef0ff;
+  --ok: #16a34a; --ok-soft: #e8f7ee; --warn: #d97706; --warn-soft: #fdf3e2; --bad: #dc2626; --bad-soft: #fdecec;
+  --shadow: 0 1px 2px rgba(20,24,50,.04), 0 8px 24px rgba(20,24,50,.06); --radius: 16px;
+}
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg: #0d1020; --bg-2: #12162a; --card: #161a2f; --text: #e9ecf8; --muted: #9ba3c0; --faint: #6b7392;
+    --border: #262b45; --accent: #818cf8; --accent-2: #a78bfa; --accent-soft: #1e2246;
+    --ok: #4ade80; --ok-soft: #12291d; --warn: #fbbf24; --warn-soft: #2d2412; --bad: #f87171; --bad-soft: #301617;
+    --shadow: 0 1px 2px rgba(0,0,0,.3), 0 8px 24px rgba(0,0,0,.25);
+  }
+}
+* { box-sizing: border-box; }
+html { -webkit-text-size-adjust: 100%; scroll-behavior: smooth; }
+body {
+  margin: 0; font: 15px/1.55 Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; color: var(--text);
+  background:
+    radial-gradient(1200px 500px at 10% -10%, color-mix(in srgb, var(--accent) 12%, transparent), transparent 60%),
+    radial-gradient(900px 400px at 100% 0%, color-mix(in srgb, var(--accent-2) 10%, transparent), transparent 60%),
+    var(--bg);
+  min-height: 100vh;
+}
+.hidden { display: none !important; }
+.wrap { max-width: 1040px; margin: 0 auto; padding: 0 16px; }
+.card { background: var(--card); border: 1px solid var(--border); border-radius: var(--radius); box-shadow: var(--shadow); padding: 22px; }
+.muted { color: var(--muted); font-size: 14px; margin: 0; }
+
+/* Nav */
+.nav { display: flex; align-items: center; gap: 10px; padding: 20px 0; flex-wrap: wrap; }
+.logo { width: 34px; height: 34px; border-radius: 10px; background: linear-gradient(135deg, var(--accent), var(--accent-2)); display: grid; place-items: center; color: #fff; }
+.brand { font-weight: 800; letter-spacing: -.02em; font-size: 17px; }
+.nav-right { margin-left: auto; display: flex; align-items: center; gap: 8px; }
+.privacy { display: inline-flex; align-items: center; gap: 6px; font-size: 13px; color: var(--muted); background: var(--card); border: 1px solid var(--border); padding: 6px 12px; border-radius: 999px; }
+.lang { display: inline-flex; background: var(--card); border: 1px solid var(--border); border-radius: 999px; padding: 3px; }
+.lang button { font: inherit; font-size: 12px; font-weight: 700; border: 0; background: none; color: var(--muted); padding: 4px 10px; border-radius: 999px; cursor: pointer; }
+.lang button.on { background: var(--accent); color: #fff; }
+@media (max-width: 560px) { .privacy { display: none; } }
+
+/* Hero */
+.hero { display: grid; gap: 20px; padding: 24px 0 28px; align-items: center; }
+@media (min-width: 860px) { .hero { grid-template-columns: 1.3fr 1fr; } }
+.eyebrow { display: inline-block; font-size: 12px; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; color: var(--accent); margin-bottom: 10px; }
+.hero h1 { margin: 0 0 12px; font-size: clamp(30px, 4.8vw, 46px); line-height: 1.08; letter-spacing: -.03em; font-weight: 800; }
+.hero h1 span { background: linear-gradient(90deg, var(--accent), var(--accent-2)); -webkit-background-clip: text; background-clip: text; color: transparent; }
+.hero p { margin: 0; color: var(--muted); font-size: 16px; }
+.hero-box h3 { margin: 0 0 10px; font-size: 14px; }
+.ticks { list-style: none; margin: 0; padding: 0; display: grid; gap: 8px; }
+.ticks li { display: flex; gap: 10px; font-size: 14px; color: var(--muted); }
+.ticks li::before { content: "✓"; flex: none; width: 20px; height: 20px; border-radius: 50%; background: var(--ok-soft); color: var(--ok); display: grid; place-items: center; font-size: 11px; font-weight: 800; }
+
+/* Inputs */
+.inputs { display: grid; gap: 22px; }
+@media (min-width: 860px) { .inputs { grid-template-columns: 1fr 1fr; } }
+.label { display: flex; align-items: center; justify-content: space-between; gap: 10px; margin: 0 0 10px; font-weight: 700; font-size: 15px; }
+.label small { color: var(--faint); font-weight: 500; font-size: 13px; }
+.seg { display: inline-flex; background: var(--bg-2); padding: 3px; border-radius: 10px; }
+.seg button { font: inherit; font-size: 13px; font-weight: 500; border: 0; background: none; color: var(--muted); padding: 5px 10px; border-radius: 8px; cursor: pointer; }
+.seg button.on { background: var(--card); color: var(--text); box-shadow: var(--shadow); }
+.drop { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 6px; text-align: center; min-height: 176px; border: 1.5px dashed var(--border); border-radius: 12px; padding: 22px 16px; cursor: pointer; background: var(--bg-2); transition: .15s; }
+.drop:hover, .drop.over { border-color: var(--accent); background: var(--accent-soft); }
+.drop .ic { width: 44px; height: 44px; border-radius: 12px; display: grid; place-items: center; background: var(--card); color: var(--accent); box-shadow: var(--shadow); }
+.drop strong { font-size: 14px; }
+.drop span { font-size: 13px; color: var(--muted); }
+.file { display: flex; align-items: center; gap: 10px; padding: 12px 14px; border-radius: 12px; background: var(--accent-soft); border: 1px solid color-mix(in srgb, var(--accent) 25%, transparent); }
+.file .name { font-weight: 600; font-size: 14px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.file .meta { font-size: 12px; color: var(--muted); }
+.file button { margin-left: auto; background: none; border: 0; color: var(--muted); cursor: pointer; font: inherit; font-size: 13px; padding: 4px 6px; border-radius: 6px; }
+.file button:hover { color: var(--text); background: var(--card); }
+textarea { width: 100%; resize: vertical; min-height: 176px; font: inherit; font-size: 14px; color: inherit; background: var(--bg-2); border: 1px solid var(--border); border-radius: 12px; padding: 12px; outline: none; transition: .15s; }
+textarea:focus { border-color: var(--accent); box-shadow: 0 0 0 3px var(--accent-soft); }
+.hint { font-size: 12px; color: var(--faint); margin-top: 6px; }
+.run-row { display: flex; align-items: center; gap: 14px; margin-top: 20px; flex-wrap: wrap; }
+.run { display: inline-flex; align-items: center; justify-content: center; gap: 8px; font: inherit; font-weight: 600; font-size: 15px; color: #fff; border: 0; border-radius: 12px; padding: 13px 26px; background: linear-gradient(135deg, var(--accent), var(--accent-2)); cursor: pointer; box-shadow: 0 6px 18px color-mix(in srgb, var(--accent) 35%, transparent); transition: .15s; }
+.run:hover:not(:disabled) { transform: translateY(-1px); }
+.run:disabled { opacity: .45; cursor: not-allowed; box-shadow: none; }
+@media (max-width: 560px) { .run { width: 100%; } }
+.spin { width: 16px; height: 16px; border: 2px solid rgba(255,255,255,.4); border-top-color: #fff; border-radius: 50%; animation: s .7s linear infinite; }
+@keyframes s { to { transform: rotate(360deg); } }
+.err { margin-top: 12px; padding: 10px 12px; border-radius: 10px; background: var(--bad-soft); color: var(--bad); font-size: 13px; }
+
+/* Sections */
+.section { margin-top: 40px; }
+.section > h2 { margin: 0 0 6px; font-size: 24px; letter-spacing: -.02em; font-weight: 800; }
+.section > .muted { margin-bottom: 16px; }
+
+/* Score */
+.score-card { display: grid; gap: 28px; align-items: center; }
+@media (min-width: 760px) { .score-card { grid-template-columns: 180px 1fr 1fr; } }
+.gauge { position: relative; width: 160px; height: 160px; margin: 0 auto; }
+.gauge svg { transform: rotate(-90deg); }
+.gauge .track { stroke: var(--bg-2); }
+.gauge .bar { transition: stroke-dashoffset 1s cubic-bezier(.2,.8,.2,1); }
+.gauge .val { position: absolute; inset: 0; display: grid; place-items: center; text-align: center; }
+.gauge .val b { display: block; font-size: 44px; font-weight: 800; letter-spacing: -.03em; line-height: 1; }
+.gauge .val small { color: var(--faint); font-size: 13px; }
+.badge { display: inline-flex; align-items: center; padding: 4px 10px; border-radius: 999px; font-size: 12px; font-weight: 700; margin-bottom: 8px; }
+.badge.ok { background: var(--ok-soft); color: var(--ok); } .badge.warn { background: var(--warn-soft); color: var(--warn); } .badge.bad { background: var(--bad-soft); color: var(--bad); }
+.score-card h3 { margin: 0 0 4px; font-size: 24px; letter-spacing: -.02em; }
+.subscores { display: grid; gap: 14px; }
+.sub-row { display: grid; gap: 6px; }
+.sub-row .top { display: flex; justify-content: space-between; font-size: 13px; font-weight: 600; }
+.sub-row .top span:last-child { color: var(--muted); font-variant-numeric: tabular-nums; }
+.meter { height: 8px; background: var(--bg-2); border-radius: 999px; overflow: hidden; }
+.meter i { display: block; height: 100%; width: 0; border-radius: 999px; transition: width 1s cubic-bezier(.2,.8,.2,1); }
+.meter i.ok { background: var(--ok); } .meter i.warn { background: var(--warn); } .meter i.bad { background: var(--bad); }
+.meter i.acc { background: linear-gradient(90deg, var(--accent), var(--accent-2)); }
+
+/* Fixes */
+.fix { display: grid; grid-template-columns: 34px 1fr; gap: 14px; padding: 16px 0; border-top: 1px solid var(--border); }
+.fix:first-child { border-top: 0; padding-top: 0; }
+.fix .num { width: 34px; height: 34px; border-radius: 10px; display: grid; place-items: center; font-weight: 800; font-size: 14px; }
+.fix.fail .num { background: var(--bad-soft); color: var(--bad); } .fix.warn .num { background: var(--warn-soft); color: var(--warn); }
+.tag { display: inline-block; font-size: 11px; font-weight: 700; letter-spacing: .04em; text-transform: uppercase; padding: 2px 8px; border-radius: 6px; margin-bottom: 4px; }
+.tag.fail { background: var(--bad-soft); color: var(--bad); } .tag.warn { background: var(--warn-soft); color: var(--warn); }
+.fix strong { display: block; font-size: 15px; }
+.fix p { margin: 2px 0 0; font-size: 14px; color: var(--muted); }
+.passed { margin-top: 14px; border-top: 1px solid var(--border); padding-top: 14px; }
+.passed summary { cursor: pointer; font-size: 14px; font-weight: 600; color: var(--ok); }
+.passed ul { list-style: none; margin: 10px 0 0; padding: 0; display: grid; gap: 8px; }
+.passed li { font-size: 13.5px; color: var(--muted); display: flex; gap: 8px; }
+.passed li b { color: var(--text); font-weight: 600; }
+.passed li::before { content: "✓"; color: var(--ok); font-weight: 800; }
+
+/* Bullets */
+.bullet { padding: 16px; border-radius: 12px; background: var(--bg-2); margin-top: 10px; }
+.bullet:first-child { margin-top: 0; }
+.bullet .txt { font-size: 14.5px; line-height: 1.5; }
+.bullet .flags { display: flex; flex-wrap: wrap; gap: 6px; margin: 10px 0 8px; }
+.flag { font-size: 12px; font-weight: 600; padding: 3px 9px; border-radius: 999px; background: var(--warn-soft); color: var(--warn); }
+.bullet .tip { font-size: 13px; color: var(--muted); }
+.bullet .tip b { color: var(--text); font-weight: 600; }
+.all-good { padding: 18px; border-radius: 12px; background: var(--ok-soft); color: var(--ok); font-weight: 600; font-size: 14px; }
+
+/* Skills & requirements */
+.two { display: grid; gap: 20px; }
+@media (min-width: 860px) { .two { grid-template-columns: 1fr 1fr; } }
+.two h3 { margin: 0 0 4px; font-size: 18px; }
+.match { display: flex; align-items: center; gap: 14px; margin: 12px 0 6px; }
+.match .pct { font-size: 28px; font-weight: 800; letter-spacing: -.02em; }
+.match .meter { flex: 1; height: 10px; }
+.kw-label { font-size: 13px; font-weight: 700; margin: 16px 0 8px; }
+.chips { display: flex; flex-wrap: wrap; gap: 6px; }
+.chip { padding: 4px 11px; border-radius: 999px; font-size: 13px; font-weight: 500; }
+.chip.miss { background: var(--bad-soft); color: var(--bad); } .chip.hit { background: var(--ok-soft); color: var(--ok); }
+.req { display: grid; grid-template-columns: 1fr auto; gap: 12px; align-items: center; padding: 12px 0; border-top: 1px solid var(--border); }
+.req:first-of-type { border-top: 0; }
+.req strong { display: block; font-size: 14px; }
+.req p { margin: 2px 0 0; font-size: 13px; color: var(--muted); }
+.pill { font-size: 12px; font-weight: 700; padding: 4px 10px; border-radius: 999px; white-space: nowrap; }
+.pill.ok { background: var(--ok-soft); color: var(--ok); } .pill.miss { background: var(--bad-soft); color: var(--bad); } .pill.unknown { background: var(--bg-2); color: var(--muted); }
+.no-jd { padding: 18px; border-radius: 12px; background: var(--bg-2); color: var(--muted); font-size: 14px; }
+
+/* Report */
+.report { display: flex; align-items: center; gap: 16px; flex-wrap: wrap; justify-content: space-between; }
+.report h3 { margin: 0 0 2px; font-size: 17px; }
+.btn-ghost { font: inherit; font-weight: 600; font-size: 14px; color: var(--accent); background: var(--accent-soft); border: 0; border-radius: 10px; padding: 10px 16px; cursor: pointer; }
+details.raw summary { cursor: pointer; font-weight: 700; font-size: 15px; list-style: none; display: flex; justify-content: space-between; }
+details summary::-webkit-details-marker { display: none; }
+details.raw summary::after, .faq summary::after { content: "+"; color: var(--faint); font-size: 20px; font-weight: 400; line-height: 1; }
+details.raw[open] summary::after, .faq details[open] summary::after { content: "−"; }
+pre { white-space: pre-wrap; word-break: break-word; max-height: 420px; overflow: auto; margin: 12px 0 0; background: var(--bg-2); border-radius: 12px; padding: 14px; font-size: 12.5px; line-height: 1.6; font-family: ui-monospace, SFMono-Regular, Menlo, monospace; }
+
+/* Info */
+.info { display: grid; gap: 20px; }
+@media (min-width: 860px) { .info { grid-template-columns: 1fr 1.4fr; align-items: start; } }
+.info h2, .faq-wrap h2 { margin: 0 0 8px; font-size: clamp(24px, 3.4vw, 32px); letter-spacing: -.02em; font-weight: 800; line-height: 1.15; }
+.factors { display: grid; gap: 12px; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); }
+.factor { padding: 18px; }
+.factor b { display: inline-grid; place-items: center; width: 28px; height: 28px; border-radius: 8px; background: var(--accent-soft); color: var(--accent); font-size: 13px; margin-bottom: 10px; }
+.factor strong { display: block; margin-bottom: 4px; }
+.factor p { margin: 0; font-size: 13.5px; color: var(--muted); }
+.faq-wrap { display: grid; gap: 20px; }
+@media (min-width: 860px) { .faq-wrap { grid-template-columns: 1fr 1.4fr; } }
+.faq details { border-top: 1px solid var(--border); padding: 16px 0; }
+.faq details:first-child { border-top: 0; padding-top: 0; }
+.faq summary { cursor: pointer; font-weight: 600; list-style: none; display: flex; justify-content: space-between; gap: 12px; }
+.faq p { margin: 10px 0 0; color: var(--muted); font-size: 14px; }
+.fade { animation: f .45s ease both; }
+@keyframes f { from { opacity: 0; transform: translateY(8px); } }
+footer { text-align: center; color: var(--faint); font-size: 12px; padding: 40px 0 32px; }
+
+@media print {
+  body { background: #fff; }
+  .nav, .hero, #inputCard, .report, .info-sec, .faq-sec, footer { display: none !important; }
+  .card { box-shadow: none; break-inside: avoid; }
+}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <nav class="nav">
+    <div class="logo"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg></div>
+    <div class="brand" data-i18n="brand"></div>
+    <div class="nav-right">
+      <div class="privacy"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg><span data-i18n="privacy"></span></div>
+      <div class="lang" id="lang"><button data-l="tr">TR</button><button data-l="en">EN</button></div>
+    </div>
+  </nav>
+
+  <header class="hero">
+    <div>
+      <span class="eyebrow" data-i18n="eyebrow"></span>
+      <h1><span data-i18n="h1a"></span> <span data-i18n="h1b"></span></h1>
+      <p data-i18n="heroP"></p>
+    </div>
+    <div class="card hero-box">
+      <h3 data-i18n="heroBoxT"></h3>
+      <ul class="ticks">
+        <li data-i18n="tick1"></li><li data-i18n="tick2"></li><li data-i18n="tick3"></li><li data-i18n="tick4"></li>
+      </ul>
+    </div>
+  </header>
+
+  <!-- Girdi -->
+  <section class="card" id="inputCard">
+    <div class="inputs">
+      <div>
+        <div class="label"><span data-i18n="yourCv"></span>
+          <div class="seg" id="mode"><button data-m="file" class="on" data-i18n="upload"></button><button data-m="paste" data-i18n="paste"></button></div>
+        </div>
+        <div id="fileMode">
+          <label id="drop" class="drop" for="file">
+            <input id="file" type="file" accept=".pdf,.docx,.txt" hidden />
+            <div class="ic"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><path d="M17 8l-5-5-5 5"/><path d="M12 3v12"/></svg></div>
+            <strong data-i18n="dropT"></strong>
+            <span data-i18n="dropS"></span>
+          </label>
+          <div id="fileBox" class="file hidden">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="color:var(--accent);flex:none"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6"/></svg>
+            <div style="min-width:0"><div class="name" id="fileName"></div><div class="meta" id="fileMeta"></div></div>
+            <button id="clear" type="button" data-i18n="change"></button>
+          </div>
+        </div>
+        <div id="pasteMode" class="hidden">
+          <textarea id="cvText" data-i18n-ph="pastePh"></textarea>
+        </div>
+      </div>
+      <div>
+        <div class="label"><span data-i18n="jdT"></span><small data-i18n="optional"></small></div>
+        <textarea id="jd" data-i18n-ph="jdPh"></textarea>
+        <div class="hint" data-i18n="jdHint"></div>
+      </div>
+    </div>
+    <div class="run-row">
+      <button id="run" class="run" disabled data-i18n="check"></button>
+      <span class="muted" data-i18n="runHint"></span>
+    </div>
+    <div id="err" class="err hidden"></div>
+  </section>
+
+  <!-- Sonuçlar -->
+  <div id="results" class="hidden">
+    <section class="section fade">
+      <h2 id="resTitle"></h2>
+      <p class="muted" id="resSub"></p>
+      <div class="card score-card">
+        <div class="gauge">
+          <svg width="160" height="160" viewBox="0 0 160 160">
+            <circle class="track" cx="80" cy="80" r="68" fill="none" stroke-width="13" />
+            <circle id="gaugeBar" class="bar" cx="80" cy="80" r="68" fill="none" stroke-width="13" stroke-linecap="round" stroke-dasharray="427.3" stroke-dashoffset="427.3" />
+          </svg>
+          <div class="val"><div><b id="score">0</b><small>/ 100</small></div></div>
+        </div>
+        <div>
+          <span id="badge" class="badge"></span>
+          <h3 id="verdict"></h3>
+          <p class="muted" id="stats"></p>
+        </div>
+        <div class="subscores" id="subscores"></div>
+      </div>
+    </section>
+
+    <section class="section fade">
+      <h2 data-i18n="fixesT"></h2>
+      <p class="muted" data-i18n="fixesS"></p>
+      <div class="card"><div id="fixes"></div><div id="passed"></div></div>
+    </section>
+
+    <section class="section fade">
+      <h2 data-i18n="bulletsT"></h2>
+      <p class="muted" id="bulletsSub"></p>
+      <div class="card" id="bullets"></div>
+    </section>
+
+    <section class="section fade">
+      <div class="two">
+        <div class="card">
+          <h3 data-i18n="skillsT"></h3>
+          <div id="skills"></div>
+        </div>
+        <div class="card">
+          <h3 data-i18n="reqT"></h3>
+          <div id="reqs"></div>
+        </div>
+      </div>
+    </section>
+
+    <section class="section fade">
+      <div class="card report">
+        <div><h3 data-i18n="reportT"></h3><p class="muted" data-i18n="reportS"></p></div>
+        <button class="btn-ghost" id="print" data-i18n="reportBtn"></button>
+      </div>
+      <details class="card raw" style="margin-top:16px">
+        <summary data-i18n="rawT"></summary>
+        <p class="muted" style="margin-top:10px" data-i18n="rawS"></p>
+        <pre id="rawText"></pre>
+      </details>
+    </section>
+  </div>
+
+  <!-- Bilgi -->
+  <section class="section info-sec">
+    <div class="info">
+      <div><h2 data-i18n="infoT"></h2><p class="muted" data-i18n="infoS"></p></div>
+      <div class="factors">
+        <div class="card factor"><b>1</b><strong data-i18n="f1T"></strong><p data-i18n="f1"></p></div>
+        <div class="card factor"><b>2</b><strong data-i18n="f2T"></strong><p data-i18n="f2"></p></div>
+        <div class="card factor"><b>3</b><strong data-i18n="f3T"></strong><p data-i18n="f3"></p></div>
+        <div class="card factor"><b>4</b><strong data-i18n="f4T"></strong><p data-i18n="f4"></p></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section faq-sec">
+    <div class="faq-wrap">
+      <div><h2 data-i18n="faqT"></h2></div>
+      <div class="card faq">
+        <details><summary data-i18n="q1"></summary><p data-i18n="a1"></p></details>
+        <details><summary data-i18n="q2"></summary><p data-i18n="a2"></p></details>
+        <details><summary data-i18n="q3"></summary><p data-i18n="a3"></p></details>
+        <details><summary data-i18n="q4"></summary><p data-i18n="a4"></p></details>
+        <details><summary data-i18n="q5"></summary><p data-i18n="a5"></p></details>
+      </div>
+    </div>
+  </section>
+</div>
+<footer data-i18n="footer"></footer>
+
+<script>
+/* =========================================================
+   Çeviriler / Translations
+   ========================================================= */
+const I18N = {
+  tr: {
+    brand: "ATS Kontrol",
+    privacy: "Dosyanız cihazınızdan çıkmaz",
+    eyebrow: "Ücretsiz · Kayıt gerektirmez",
+    h1a: "ATS CV kontrolü", h1b: "ve özgeçmiş tarayıcı",
+    heroP: "CV'nizi başvurmadan önce kontrol edin. İşe alım yazılımlarının neyi okuyup neyi kaçırdığını ve iş ilanıyla ne kadar eşleştiğinizi görün.",
+    heroBoxT: "Neler alırsınız?",
+    tick1: "ATS uyum puanı ve alt puanlar",
+    tick2: "Öncelik sırasına göre düzeltme listesi",
+    tick3: "Güçlendirilmesi gereken CV maddeleri",
+    tick4: "İlandaki beceri ve gereksinimlerle karşılaştırma",
+    yourCv: "CV'niz", upload: "Dosya yükle", paste: "Metin yapıştır",
+    dropT: "Dosyayı sürükleyin veya seçin", dropS: "PDF, DOCX veya TXT", change: "Değiştir",
+    pastePh: "CV metninizi buraya yapıştırın...",
+    jdT: "İş ilanı", optional: "isteğe bağlı",
+    jdPh: "İlan metnini buraya yapıştırın...",
+    jdHint: "İlan eklerseniz beceri eşleşmesi ve gereksinim karşılaştırması da yapılır.",
+    check: "CV'mi kontrol et", checking: "Analiz ediliyor", runHint: "Birkaç saniye sürer.",
+    errRead: "Dosya okunamadı: ",
+    errPdfLib: "PDF okuyucu yüklenemedi, internet bağlantınızı kontrol edin.",
+    errDocxLib: "DOCX okuyucu yüklenemedi, internet bağlantınızı kontrol edin.",
+    errType: "Desteklenmeyen dosya türü (.doc yerine .docx kullanın).",
+    resTitleJd: "Bu ilana göre CV'niz", resTitle: "CV'nizin ATS sonucu",
+    resSubJd: "ATS uyumu ve ilanla eşleşme birlikte değerlendirildi.",
+    resSub: "Daha isabetli sonuç için bir iş ilanı da ekleyebilirsiniz.",
+    lvlJd: { ok: "Güçlü eşleşme", warn: "Orta eşleşme", bad: "Zayıf eşleşme" },
+    lvl: { ok: "ATS uyumlu", warn: "Geliştirilebilir", bad: "Riskli" },
+    verdict: { ok: "CV'niz ATS'den rahat geçer", warn: "Birkaç düzeltmeyle çok daha iyi olur", bad: "CV'niz ATS'de takılabilir" },
+    words: "kelime", pages: "sayfa", pastedText: "yapıştırılan metin",
+    sub: { format: "Format ve okunabilirlik", structure: "Yapı ve bölümler", content: "İçerik kalitesi", keywords: "İlan anahtar kelimeleri" },
+    fixesT: "Öncelik sırasına göre düzeltmeler",
+    fixesS: "En büyük etkiyi yaratacak olandan başlayarak.",
+    noFixes: "Düzeltilmesi gereken bir şey bulunamadı. Harika!",
+    prio: { fail: "Kritik", warn: "Düzeltmeye değer", info: "Önerilen" },
+    passedN: (n) => `Geçen kontroller (${n})`,
+    bulletsT: "Güçlendirilmesi gereken maddeler",
+    bulletsSub: (b, t) => t ? `${t} madde incelendi, ${b} tanesi güçlendirilebilir.` : "CV'de madde işaretli satır bulunamadı.",
+    noBullets: "Deneyimlerinizi madde işaretleriyle (•, -) yazmanız ATS ve işe alımcılar için okunmayı kolaylaştırır.",
+    bulletsGood: "Tüm maddeler iyi görünüyor: sayısal, eylem odaklı ve uygun uzunlukta.",
+    flag: { noNumber: "Sayı yok", weak: "Zayıf ifade", noVerb: "Eylem fiili yok", long: "Çok uzun", short: "Çok kısa" },
+    tip: {
+      noNumber: "Sonucu ölçün: yüzde, tutar, kişi sayısı veya süre ekleyin.",
+      weak: "\"Sorumluydum, yardımcı oldum\" yerine ne yaptığınızı ve sonucunu yazın.",
+      noVerb: "Maddeyi \"geliştirdim, yönettim, artırdım\" gibi bir eylemle kurun.",
+      long: "Tek bir başarıya odaklanıp 1–2 satıra indirin.",
+      short: "Ne yaptığınızı, nasıl yaptığınızı ve sonucunu ekleyin.",
+    },
+    tipLabel: "Öneri:",
+    skillsT: "İlandaki beceriler",
+    skillsS: "İlanda öne çıkan terimlerin CV'nizde geçme oranı.",
+    missing: "Eksik", found: "Bulunan",
+    noMissing: "Eksik kelime yok.", noFound: "Eşleşen kelime yok.",
+    reqT: "İlandaki gereksinimler",
+    noJd: "Beceri ve gereksinim karşılaştırması için yukarıya bir iş ilanı yapıştırın.",
+    noReq: "İlanda deneyim süresi, eğitim, dil veya ehliyet gibi belirgin bir gereksinim bulunamadı.",
+    pill: { ok: "Karşılıyor", miss: "Eksik", unknown: "Belirsiz" },
+    req: {
+      years: { t: (p) => `En az ${p.need} yıl deneyim`, ok: (p) => `CV'nizdeki tarihlere göre yaklaşık ${p.have} yıl deneyim.`, miss: (p) => `CV'nizdeki tarihlere göre yaklaşık ${p.have} yıl deneyim görünüyor.`, unknown: () => "CV'nizden deneyim süresi hesaplanamadı. Tarihleri \"03/2021 – 05/2024\" biçiminde yazın." },
+      degree: { t: (p) => ({ 1: "Lisans derecesi", 2: "Yüksek lisans derecesi", 3: "Doktora derecesi" })[p.need], ok: () => "CV'nizde bu seviyede eğitim bulundu.", miss: () => "CV'nizde bu seviyede eğitim bulunamadı." },
+      lang: { t: (p) => `${p.name} dil bilgisi`, ok: () => "CV'nizde geçiyor.", miss: () => "CV'nizde bulunamadı. Varsa seviyesiyle birlikte ekleyin (ör. İngilizce – C1)." },
+      license: { t: () => "Sürücü belgesi", ok: () => "CV'nizde geçiyor.", miss: () => "CV'nizde bulunamadı. Varsa sınıfıyla ekleyin (ör. B sınıfı ehliyet)." },
+    },
+    langNames: { english: "İngilizce", german: "Almanca", french: "Fransızca", spanish: "İspanyolca", arabic: "Arapça", russian: "Rusça", italian: "İtalyanca", turkish: "Türkçe" },
+    reportT: "Raporunuz",
+    reportS: "Sonuçları PDF olarak kaydedip daha sonra karşılaştırabilirsiniz.",
+    reportBtn: "PDF olarak kaydet",
+    rawT: "ATS'nin gördüğü metin",
+    rawS: "Bir ATS dosyanızdan bu metni çıkarır. Sıra karışıksa veya bilgiler eksikse düzeni sadeleştirin.",
+    noText: "(metin çıkarılamadı)",
+    infoT: "İşe alımcının CV'nizi bulmasını ne belirler?",
+    infoS: "Çoğu şirket başvuruları bir ATS ile tarar. İşe alımcılar adayları anahtar kelimeyle arar ve sıralar. Bu dört şey CV'nizin listede görünüp görünmeyeceğini belirler.",
+    f1T: "Dosya okunabilmeli", f1: "Taranmış görseller, tablolar ve çok sütunlu tasarımlar metnin karışmasına ya da kaybolmasına neden olur.",
+    f2T: "CV ilanın dilini konuşmalı", f2: "İşe alımcılar ilandaki terimlerle arama yapar. Aynı becerileri aynı ifadelerle yazın.",
+    f3T: "Yapı standart olmalı", f3: "\"Deneyim\", \"Eğitim\", \"Yetenekler\" gibi bilinen başlıklar ATS'nin bilgileri doğru alana yerleştirmesini sağlar.",
+    f4T: "Başarılar ölçülebilir olmalı", f4: "ATS'den geçtikten sonra CV'yi bir insan okur. Sayılarla desteklenen sonuçlar öne çıkar.",
+    faqT: "Sık sorulan sorular",
+    q1: "Bu araç ücretsiz mi?", a1: "Evet. Kayıt veya ödeme gerektirmez.",
+    q2: "CV'm bir sunucuya yükleniyor mu?", a2: "Hayır. Dosyanız tamamen tarayıcınızda işlenir ve hiçbir yere gönderilmez.",
+    q3: "ATS nedir?", a3: "Başvuru Takip Sistemi (Applicant Tracking System), şirketlerin başvuruları topladığı, CV'lerden bilgi çıkardığı ve adayları aradığı yazılımdır. Workday, Greenhouse, Lever ve Kariyer.net bunlara örnektir.",
+    q4: "Puan nasıl hesaplanıyor?", a4: "Okunabilirlik, düzen, bölümler ve iletişim bilgileri gibi kontroller ağırlıklarına göre puanlanır. Maddeler orantılı puanlanır: örneğin maddelerin yarısında sayı yoksa o kontrolden yarım puan alırsınız. İlan eklerseniz anahtar kelime eşleşmesi puanın %30'unu oluşturur. Farklı araçlar farklı ölçütler kullandığı için puanlar araçtan araca değişir.",
+    q5: "PDF mi Word mü göndermeliyim?", a5: "İkisi de çoğu ATS'de çalışır. Önemli olan PDF'in metin içermesi (taranmış olmaması) ve tek sütunlu sade bir düzen kullanılmasıdır.",
+    footer: "Sonuçlar yol göstericidir; her ATS farklı çalışır.",
+    sec: { summary: "Özet", experience: "Deneyim", education: "Eğitim", skills: "Yetenekler" },
+    contactItems: { email: "e-posta", phone: "telefon" },
+    checks: {
+      readable: { t: { pass: "Metin okunabiliyor", fail: "Metin okunamıyor" },
+        pass: (p) => `${p.wc} kelime başarıyla çıkarıldı.`,
+        fail: () => "Dosyadan neredeyse hiç metin çıkmadı. CV taranmış görsel olabilir. Word veya Google Docs'tan metin içeren PDF olarak dışa aktarın." },
+      columns: { t: { pass: "Tek sütunlu düzen", warn: "Yan yana metin", fail: "Çok sütunlu düzen" },
+        pass: () => "Metin akışı ATS için uygun görünüyor.",
+        warn: (p) => `Satırların %${p.pct}'inde yan yana metin var (ör. sağa yaslı tarihler). İki sütunlu tasarımdan kaçının.`,
+        fail: (p) => p.two ? "CV iki sütunlu. Birçok ATS satırları soldan sağa okur ve iki sütunu birbirine karıştırır; maddeleriniz başka bölümlerin metniyle birleşebilir. Tek sütunlu bir düzene geçin." : `Satırların %${p.pct}'inde yan yana bloklar var. ATS'ler sütunları karıştırabilir; tek sütunlu düzen kullanın.` },
+      tables: { t: "Tablolar", pass: () => "Tablo kullanılmamış.", fail: (p) => `${p.n} tablo bulundu. ATS'ler tablo içeriğini sıklıkla yanlış okur; düz metne çevirin.` },
+      images: { t: "Görseller ve ikonlar", pass: () => "Görsel yok.", warn: (p) => `${p.n} görsel bulundu (fotoğraf, ikon, grafik). ATS bunları okuyamaz; önemli bilgileri metin olarak yazın.` },
+      chars: { t: "Özel karakterler", pass: () => "Sorunlu karakter yok.", warn: (p) => `${p.n} emoji, ikon veya okunamayan karakter bulundu. Standart madde işaretleri (•, -) kullanın.` },
+      contact: { t: "İletişim bilgileri",
+        pass: (p) => `E-posta ve telefon bulundu${p.li ? ", LinkedIn de var" : ""}.`,
+        warn: (p) => `Bulunamadı: ${p.missing}. Bu bilgileri üst/alt bilgi (header/footer) yerine sayfanın gövdesine düz metin olarak yazın.`,
+        fail: (p) => `Bulunamadı: ${p.missing}. Bu bilgileri üst/alt bilgi (header/footer) yerine sayfanın gövdesine düz metin olarak yazın.` },
+      linkedin: { t: "LinkedIn profili", warn: () => "linkedin.com/in/... bağlantınızı eklemeniz önerilir." },
+      sections: { t: "Standart bölüm başlıkları",
+        pass: (p) => `Bulundu: ${p.list}.`,
+        warn: (p) => `Eksik veya tanınmayan: ${p.list}. ATS'ler "Deneyim", "Eğitim", "Yetenekler" gibi standart başlıkları arar.`,
+        fail: (p) => `Eksik veya tanınmayan: ${p.list}. ATS'ler "Deneyim", "Eğitim", "Yetenekler" gibi standart başlıkları arar.` },
+      length: { t: "CV uzunluğu",
+        pass: (p) => `${p.wc} kelime, uygun aralıkta.`,
+        warn: (p) => p.short ? `${p.wc} kelime, çok kısa. Deneyimlerinizi daha ayrıntılı anlatın (400–900 kelime ideal).` : `${p.wc} kelime, uzun. Son 10 yıla ve ilgili deneyimlere odaklanın.` },
+      pages: { t: "Sayfa sayısı", warn: (p) => `${p.n} sayfa. Çoğu pozisyon için 1–2 sayfa önerilir.` },
+      dates: { t: "Tarihler", pass: (p) => `${p.n} tarih bulundu.`, warn: () => "Deneyim ve eğitim için tarih bulunamadı. \"03/2021 – 05/2024\" gibi tutarlı bir format kullanın." },
+      metrics: { t: "Ölçülebilir başarılar", pass: (p) => `${p.n} sayısal başarı ifadesi bulundu.`, warn: () => "Başarılarınızı sayılarla destekleyin (ör. \"satışları %20 artırdım\")." },
+      verbs: { t: "Eylem fiilleri", pass: (p) => `Güçlü fiiller kullanılmış: ${p.list}.`, warn: () => "Maddeleri \"geliştirdim, yönettim, artırdım\" gibi eylem fiilleriyle kurun." },
+      bulletNumbers: { t: "Maddelere sayı ekleyin",
+        pass: (p) => `${p.total} maddenin ${p.total - p.without} tanesinde ölçülebilir sonuç var.`,
+        warn: (p) => `${p.total} maddenin ${p.without} tanesinde hiç sayı yok. İşe alımcılar ölçülebilir sonuç arar: yüzde, tutar, süre veya kişi sayısı ekleyin.` },
+      bulletVerbs: { t: "Maddelere ne yaptığınızla başlayın",
+        pass: (p) => `${p.total} maddenin ${p.total - p.bad} tanesi eylem odaklı.`,
+        warn: (p) => `${p.total} maddenin ${p.bad} tanesi "sorumluydum, yardımcı oldum" gibi zayıf ifadeler kullanıyor ya da eylem içermiyor.` },
+      jd: { t: "İş ilanını ekleyin", warn: () => "İlan olmadan beceri ve gereksinim eşleşmesi yapılamaz. Başvurduğunuz ilanı yapıştırıp hangi kelimelerin eksik olduğunu görün." },
+      format: { t: "Dosya formatı", pass: (p) => `.${p.ext} çoğu ATS tarafından desteklenir.`, warn: () => "Başvurularda .pdf veya .docx tercih edin." },
+      filename: { t: "Dosya adı", pass: (p) => `"${p.name}" anlaşılır görünüyor.`, warn: (p) => `"${p.name}" yerine "Ad_Soyad_CV.pdf" gibi bir isim kullanın.` },
+      filesize: { t: "Dosya boyutu", pass: (p) => `${p.mb} MB, uygun.`, warn: (p) => `${p.mb} MB. Bazı sistemler 2 MB üstünü reddeder; görselleri kaldırın veya sıkıştırın.` },
+    },
+  },
+
+  en: {
+    brand: "ATS Checker",
+    privacy: "Your file never leaves your device",
+    eyebrow: "Free · No sign-up",
+    h1a: "ATS CV checker", h1b: "and resume scanner",
+    heroP: "Check your CV before you apply. See what hiring software reads, what it misses, and how well you match the job ad.",
+    heroBoxT: "What you get",
+    tick1: "An ATS score with sub-scores",
+    tick2: "A list of fixes, in order of impact",
+    tick3: "CV bullets that need strengthening",
+    tick4: "A comparison with the skills and requirements in the ad",
+    yourCv: "Your CV", upload: "Upload file", paste: "Paste text",
+    dropT: "Drag a file here or browse", dropS: "PDF, DOCX or TXT", change: "Change",
+    pastePh: "Paste your CV text here...",
+    jdT: "Job description", optional: "optional",
+    jdPh: "Paste the job ad here...",
+    jdHint: "Add a job ad to also get skill matching and a requirements check.",
+    check: "Check my CV", checking: "Analysing", runHint: "Takes a few seconds.",
+    errRead: "Could not read the file: ",
+    errPdfLib: "The PDF reader failed to load. Check your internet connection.",
+    errDocxLib: "The DOCX reader failed to load. Check your internet connection.",
+    errType: "Unsupported file type (use .docx instead of .doc).",
+    resTitleJd: "Your CV against this job", resTitle: "Your CV's ATS result",
+    resSubJd: "ATS compatibility and job match combined.",
+    resSub: "Add a job ad for a more targeted result.",
+    lvlJd: { ok: "Strong match", warn: "Fair match", bad: "Weak match" },
+    lvl: { ok: "ATS friendly", warn: "Needs work", bad: "At risk" },
+    verdict: { ok: "Your CV should pass ATS easily", warn: "A few fixes will make it much stronger", bad: "Your CV may get stuck in ATS" },
+    words: "words", pages: "pages", pastedText: "pasted text",
+    sub: { format: "Format & readability", structure: "Structure & sections", content: "Content quality", keywords: "Job ad keywords" },
+    fixesT: "Fixes to make, in order",
+    fixesS: "Starting with the ones that make the biggest difference.",
+    noFixes: "Nothing to fix. Great job!",
+    prio: { fail: "Critical", warn: "Worth fixing", info: "Suggested" },
+    passedN: (n) => `Passed checks (${n})`,
+    bulletsT: "Bullets to strengthen",
+    bulletsSub: (b, t) => t ? `${t} bullets reviewed, ${b} could be stronger.` : "No bulleted lines found in your CV.",
+    noBullets: "Writing your experience as bullet points (•, -) makes it easier for both ATS and recruiters to read.",
+    bulletsGood: "All bullets look good: quantified, action-led and the right length.",
+    flag: { noNumber: "No number", weak: "Weak phrasing", noVerb: "No action verb", long: "Too long", short: "Too short" },
+    tip: {
+      noNumber: "Quantify the result: add a percentage, amount, headcount or time saved.",
+      weak: "Replace \"responsible for / helped with\" with what you did and what came of it.",
+      noVerb: "Start with an action verb such as led, built, increased.",
+      long: "Focus on one achievement and cut it to 1–2 lines.",
+      short: "Add what you did, how, and the outcome.",
+    },
+    tipLabel: "Tip:",
+    skillsT: "Skills from the advert",
+    skillsS: "How many of the ad's key terms appear in your CV.",
+    missing: "Missing", found: "Found",
+    noMissing: "No missing terms.", noFound: "No matching terms.",
+    reqT: "Requirements from the advert",
+    noJd: "Paste a job ad above to compare skills and requirements.",
+    noReq: "No clear requirements (years of experience, degree, language, licence) found in the ad.",
+    pill: { ok: "Met", miss: "Missing", unknown: "Unclear" },
+    req: {
+      years: { t: (p) => `At least ${p.need} years of experience`, ok: (p) => `About ${p.have} years based on the dates in your CV.`, miss: (p) => `Your CV dates show about ${p.have} years.`, unknown: () => "Couldn't work out your experience from the CV. Write dates like \"03/2021 – 05/2024\"." },
+      degree: { t: (p) => ({ 1: "Bachelor's degree", 2: "Master's degree", 3: "PhD" })[p.need], ok: () => "A degree at this level was found in your CV.", miss: () => "No degree at this level was found in your CV." },
+      lang: { t: (p) => `${p.name} language skills`, ok: () => "Mentioned in your CV.", miss: () => "Not found in your CV. If you have it, add it with your level (e.g. German – B2)." },
+      license: { t: () => "Driving licence", ok: () => "Mentioned in your CV.", miss: () => "Not found in your CV. If you have one, add it." },
+    },
+    langNames: { english: "English", german: "German", french: "French", spanish: "Spanish", arabic: "Arabic", russian: "Russian", italian: "Italian", turkish: "Turkish" },
+    reportT: "Your report",
+    reportS: "Save the results as a PDF to compare later.",
+    reportBtn: "Save as PDF",
+    rawT: "What the ATS sees",
+    rawS: "This is the text an ATS extracts from your file. If the order is jumbled or details are missing, simplify the layout.",
+    noText: "(no text could be extracted)",
+    infoT: "What decides whether a recruiter finds your CV",
+    infoS: "Most companies screen applications with an ATS. Recruiters search and rank candidates by keyword. These four things decide whether your CV shows up.",
+    f1T: "The file has to be readable", f1: "Scanned images, tables and multi-column designs cause text to get jumbled or lost.",
+    f2T: "The CV uses the advert's language", f2: "Recruiters search using the terms in the ad. Describe the same skills with the same words.",
+    f3T: "The structure is standard", f3: "Familiar headings like \"Experience\", \"Education\" and \"Skills\" help the ATS put your details in the right fields.",
+    f4T: "Achievements are measurable", f4: "After the ATS, a human reads your CV. Results backed by numbers stand out.",
+    faqT: "Questions about the CV checker",
+    q1: "Is the CV checker free?", a1: "Yes. No sign-up or payment needed.",
+    q2: "Is my CV uploaded to a server?", a2: "No. Your file is processed entirely in your browser and is never sent anywhere.",
+    q3: "What is an ATS?", a3: "An Applicant Tracking System is software companies use to collect applications, extract information from CVs and search for candidates. Workday, Greenhouse and Lever are common examples.",
+    q4: "How is the score calculated?", a4: "Checks such as readability, layout, sections and contact details are scored by weight. Bullets are scored proportionally: if half your bullets have no number, you get half the points for that check. If you add a job ad, keyword match makes up 30% of the score. Scores differ between tools because each uses its own criteria.",
+    q5: "Should I send a PDF or a Word file?", a5: "Both work in most ATS. What matters is that the PDF contains real text (not a scan) and uses a simple single-column layout.",
+    footer: "Results are guidance only; every ATS works differently.",
+    sec: { summary: "Summary", experience: "Experience", education: "Education", skills: "Skills" },
+    contactItems: { email: "email", phone: "phone" },
+    checks: {
+      readable: { t: { pass: "Text is readable", fail: "Text can't be read" },
+        pass: (p) => `${p.wc} words extracted successfully.`,
+        fail: () => "Almost no text came out of the file. It may be a scanned image. Export it from Word or Google Docs as a text-based PDF." },
+      columns: { t: { pass: "Single-column layout", warn: "Side-by-side text", fail: "Multi-column layout" },
+        pass: () => "The text flow looks ATS-friendly.",
+        warn: (p) => `${p.pct}% of lines have text side by side (e.g. right-aligned dates). Avoid two-column designs.`,
+        fail: (p) => p.two ? "Your CV has two columns. Many ATS read lines left to right and mix the columns together, so your bullets can merge with text from other sections. Switch to a single-column layout." : `${p.pct}% of lines have side-by-side blocks. ATS may mix up columns; use a single-column layout.` },
+      tables: { t: "Tables", pass: () => "No tables used.", fail: (p) => `${p.n} table(s) found. ATS often misread table content; convert to plain text.` },
+      images: { t: "Images & icons", pass: () => "No images.", warn: (p) => `${p.n} image(s) found (photo, icons, charts). ATS can't read them; keep key info as text.` },
+      chars: { t: "Special characters", pass: () => "No problematic characters.", warn: (p) => `${p.n} emoji, icons or unreadable characters found. Use standard bullets (•, -).` },
+      contact: { t: "Contact details",
+        pass: (p) => `Email and phone found${p.li ? ", plus LinkedIn" : ""}.`,
+        warn: (p) => `Not found: ${p.missing}. Put these in the body of the page as plain text, not in a header/footer.`,
+        fail: (p) => `Not found: ${p.missing}. Put these in the body of the page as plain text, not in a header/footer.` },
+      linkedin: { t: "LinkedIn profile", warn: () => "Consider adding your linkedin.com/in/... link." },
+      sections: { t: "Standard section headings",
+        pass: (p) => `Found: ${p.list}.`,
+        warn: (p) => `Missing or unrecognised: ${p.list}. ATS look for standard headings like "Experience", "Education", "Skills".`,
+        fail: (p) => `Missing or unrecognised: ${p.list}. ATS look for standard headings like "Experience", "Education", "Skills".` },
+      length: { t: "CV length",
+        pass: (p) => `${p.wc} words, within the ideal range.`,
+        warn: (p) => p.short ? `${p.wc} words, too short. Describe your experience in more detail (400–900 words is ideal).` : `${p.wc} words, long. Focus on the last 10 years and relevant roles.` },
+      pages: { t: "Page count", warn: (p) => `${p.n} pages. 1–2 pages is recommended for most roles.` },
+      dates: { t: "Dates", pass: (p) => `${p.n} dates found.`, warn: () => "No dates found for experience or education. Use a consistent format like \"03/2021 – 05/2024\"." },
+      metrics: { t: "Measurable achievements", pass: (p) => `${p.n} quantified achievements found.`, warn: () => "Back up achievements with numbers (e.g. \"increased sales by 20%\")." },
+      verbs: { t: "Action verbs", pass: (p) => `Strong verbs used: ${p.list}.`, warn: () => "Start bullets with action verbs like led, built, increased." },
+      bulletNumbers: { t: "Add numbers to your bullets",
+        pass: (p) => `${p.total - p.without} of ${p.total} bullets show a measurable result.`,
+        warn: (p) => `${p.without} of ${p.total} bullets have no number. Recruiters look for measurable results: add a percentage, amount, time or headcount.` },
+      bulletVerbs: { t: "Start bullets with what you did",
+        pass: (p) => `${p.total - p.bad} of ${p.total} bullets are action-led.`,
+        warn: (p) => `${p.bad} of ${p.total} bullets use weak phrasing like "responsible for / helped with" or don't start with an action.` },
+      jd: { t: "Paste the job description", warn: () => "Without the ad there's nothing to match skills and requirements against. Paste the job you're applying for to see which terms are missing." },
+      format: { t: "File format", pass: (p) => `.${p.ext} is supported by most ATS.`, warn: () => "Prefer .pdf or .docx for applications." },
+      filename: { t: "File name", pass: (p) => `"${p.name}" looks clear.`, warn: (p) => `Use a name like "First_Last_CV.pdf" instead of "${p.name}".` },
+      filesize: { t: "File size", pass: (p) => `${p.mb} MB, fine.`, warn: (p) => `${p.mb} MB. Some systems reject files over 2 MB; remove or compress images.` },
+    },
+  },
+};
+
+let LANG = "tr";
+try { LANG = localStorage.getItem("ats-lang") || ((navigator.language || "tr").startsWith("tr") ? "tr" : "en"); } catch (e) {}
+if (!I18N[LANG]) LANG = "tr";
+const T = () => I18N[LANG];
+
+function applyI18n() {
+  document.documentElement.lang = LANG;
+  document.title = LANG === "tr" ? "ATS CV Kontrol" : "ATS CV Checker";
+  document.querySelectorAll("[data-i18n]").forEach((el) => { const v = T()[el.dataset.i18n]; if (typeof v === "string") el.textContent = v; });
+  document.querySelectorAll("[data-i18n-ph]").forEach((el) => { el.placeholder = T()[el.dataset.i18nPh]; });
+  [...$("lang").children].forEach((b) => b.classList.toggle("on", b.dataset.l === LANG));
+  if (lastResult) render(lastResult, false);
+}
+
+/* =========================================================
+   Arayüz
+   ========================================================= */
+if (window.pdfjsLib) pdfjsLib.GlobalWorkerOptions.workerSrc = "https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js";
+const $ = (id) => document.getElementById(id);
+let currentFile = null, mode = "file", lastResult = null;
+
+$("lang").addEventListener("click", (e) => {
+  const b = e.target.closest("button"); if (!b) return;
+  LANG = b.dataset.l;
+  try { localStorage.setItem("ats-lang", LANG); } catch (err) {}
+  applyI18n();
+});
+
+$("mode").addEventListener("click", (e) => {
+  const b = e.target.closest("button"); if (!b) return;
+  mode = b.dataset.m;
+  [...$("mode").children].forEach((x) => x.classList.toggle("on", x === b));
+  $("fileMode").classList.toggle("hidden", mode !== "file");
+  $("pasteMode").classList.toggle("hidden", mode !== "paste");
+  updateRun();
+});
+$("cvText").addEventListener("input", updateRun);
+function updateRun() { $("run").disabled = mode === "file" ? !currentFile : !$("cvText").value.trim(); }
+
+const drop = $("drop");
+$("file").addEventListener("change", (e) => setFile(e.target.files[0]));
+["dragenter", "dragover"].forEach((t) => drop.addEventListener(t, (e) => { e.preventDefault(); drop.classList.add("over"); }));
+["dragleave", "drop"].forEach((t) => drop.addEventListener(t, (e) => { e.preventDefault(); drop.classList.remove("over"); }));
+drop.addEventListener("drop", (e) => setFile(e.dataTransfer.files[0]));
+$("clear").addEventListener("click", () => { $("file").value = ""; $("file").click(); });
+$("print").addEventListener("click", () => window.print());
+
+function setFile(f) {
+  if (!f) return;
+  currentFile = f;
+  $("fileName").textContent = f.name;
+  $("fileMeta").textContent = (f.size / 1024).toFixed(0) + " KB";
+  drop.classList.add("hidden");
+  $("fileBox").classList.remove("hidden");
+  $("err").classList.add("hidden");
+  updateRun();
+}
+
+$("run").addEventListener("click", async () => {
+  const btn = $("run");
+  btn.disabled = true;
+  btn.innerHTML = `<span class="spin"></span> ${T().checking}`;
+  $("err").classList.add("hidden");
+  try {
+    const doc = mode === "file"
+      ? await extract(currentFile)
+      : { name: "", size: 0, ext: "txt", pasted: true, text: $("cvText").value, pages: null };
+    lastResult = analyze(doc, $("jd").value);
+    render(lastResult, true);
+  } catch (err) {
+    console.error(err);
+    $("err").textContent = T().errRead + err.message;
+    $("err").classList.remove("hidden");
+  } finally {
+    btn.textContent = T().check;
+    updateRun();
+  }
+});
+
+/* =========================================================
+   Metin çıkarma
+   ========================================================= */
+async function extract(file) {
+  const ext = file.name.split(".").pop().toLowerCase();
+  const buf = await file.arrayBuffer();
+  const base = { name: file.name, size: file.size, ext };
+  if (ext === "pdf") { if (!window.pdfjsLib) throw new Error(T().errPdfLib); return { ...base, ...(await extractPdf(buf)) }; }
+  if (ext === "docx") { if (!window.mammoth) throw new Error(T().errDocxLib); return { ...base, ...(await extractDocx(buf)) }; }
+  if (ext === "txt") return { ...base, text: new TextDecoder().decode(buf), pages: null };
+  throw new Error(T().errType);
+}
+
+async function extractPdf(buf) {
+  const pdf = await pdfjsLib.getDocument({ data: buf }).promise;
+  let text = "", images = 0, multiColLines = 0, totalLines = 0, pageCols = 0;
+  const OPS = pdfjsLib.OPS;
+  for (let p = 1; p <= pdf.numPages; p++) {
+    const page = await pdf.getPage(p);
+    const width = page.getViewport({ scale: 1 }).width;
+    const content = await page.getTextContent();
+    const lines = new Map();
+    for (const it of content.items) {
+      if (!it.str || !it.str.trim()) continue;
+      const y = Math.round(it.transform[5] / 3) * 3, x = it.transform[4];
+      if (!lines.has(y)) lines.set(y, []);
+      lines.get(y).push({ x, end: x + (it.width || 0), str: it.str, h: Math.abs(it.transform[3]) || 10 });
+    }
+    const ys = [...lines.keys()].sort((a, b) => b - a);
+    const joinRow = (row) => {
+      let line = row[0].str;
+      for (let i = 1; i < row.length; i++) line += (row[i].x - row[i - 1].end > row[i].h * 0.2 ? " " : "") + row[i].str;
+      return line.replace(/\s+/g, " ").trim();
+    };
+    // Büyük boşluklu satırlar (ör. sağa yaslı tarihler)
+    for (const y of ys) {
+      const row = lines.get(y).sort((a, b) => a.x - b.x);
+      totalLines++;
+      for (let i = 1; i < row.length; i++) if (row[i].x - row[i - 1].end > width * 0.12) { multiColLines++; break; }
+    }
+    // Sütun algılama: sayfanın ortasında çok sayıda satırın başladığı ortak bir x varsa ve
+    // neredeyse hiçbir satır bu çizgiyi geçmiyorsa sayfa iki sütunludur
+    let colX = null;
+    // Satırları "bloklara" ayır: kelime aralığından büyük boşluklar blok sınırıdır
+    const segs = [];
+    for (const y of ys) {
+      const row = lines.get(y);
+      let cur = { x: row[0].x, end: row[0].end };
+      for (let i = 1; i < row.length; i++) {
+        if (row[i].x - row[i - 1].end > row[i].h * 0.8) { segs.push(cur); cur = { x: row[i].x, end: row[i].end }; }
+        else cur.end = Math.max(cur.end, row[i].end);
+      }
+      segs.push(cur);
+    }
+    const buckets = new Map();
+    for (const sg of segs) {
+      if (sg.x > width * 0.25 && sg.x < width * 0.75) { const k = Math.round(sg.x / 6) * 6; buckets.set(k, (buckets.get(k) || 0) + 1); }
+    }
+    const [bx, bn] = [...buckets.entries()].sort((p, q) => q[1] - p[1])[0] || [0, 0];
+    if (bn >= 5) {
+      const cx = bx - 4;
+      const crossing = segs.filter((sg) => sg.x < cx - 4 && sg.end > cx + 8).length;
+      const leftOnly = segs.filter((sg) => sg.end <= cx + 8).length;
+      if (leftOnly >= 5 && crossing <= Math.max(2, segs.length * 0.05)) colX = cx;
+    }
+    if (colX) { pageCols++; }
+    if (colX) {
+      const left = [], right = [];
+      for (const y of ys) {
+        const row = lines.get(y);
+        const l = row.filter((r) => r.x < colX), r = row.filter((r) => r.x >= colX);
+        if (l.length) left.push(joinRow(l));
+        if (r.length) right.push(joinRow(r));
+      }
+      text += left.join("\n") + "\n\n" + right.join("\n") + "\n";
+    } else {
+      for (const y of ys) text += joinRow(lines.get(y)) + "\n";
+    }
+    text += "\n";
+    const ops = await page.getOperatorList();
+    for (const fn of ops.fnArray) if (fn === OPS.paintImageXObject || fn === OPS.paintInlineImageXObject || fn === OPS.paintJpegXObject) images++;
+  }
+  return { text, pages: pdf.numPages, images, columns: pageCols > 0, multiColRatio: totalLines ? multiColLines / totalLines : 0 };
+}
+
+async function extractDocx(buf) {
+  const raw = await mammoth.extractRawText({ arrayBuffer: buf });
+  const html = (await mammoth.convertToHtml({ arrayBuffer: buf })).value;
+  return { text: raw.value, pages: null, images: (html.match(/<img/g) || []).length, tables: (html.match(/<table/g) || []).length };
+}
+
+/* =========================================================
+   Analiz
+   ========================================================= */
+const lower = (s) => s.toLocaleLowerCase("tr");
+/* Karşılaştırma için: Türkçe "I→ı" dönüşümü İngilizce kelimeleri bozmasın diye ı/i birleştirilir */
+const fold = (s) => lower(s).replace(/ı/g, "i").replace(/i\u0307/g, "i");
+const foldList = (a) => a.map(fold);
+
+const SECTION_KEYS = {
+  summary: ["özet", "profil", "hakkımda", "summary", "profile", "objective", "about me", "kariyer hedefi", "about"],
+  experience: ["deneyim", "iş deneyimi", "tecrübe", "experience", "work experience", "employment", "professional experience", "work history"],
+  education: ["eğitim", "education", "öğrenim"],
+  skills: ["yetenek", "beceri", "skills", "yetkinlik", "teknik beceriler", "competencies", "expertise", "uzmanlık", "tech stack", "technologies", "teknolojiler"],
+  other: ["proje", "project", "sertifika", "certific", "diller", "languages", "referans", "reference", "hobi", "interests", "gönüllü", "volunteer", "ödül", "award", "kurs", "course", "yayın", "publication"],
+};
+
+const ACTION_VERBS = [
+  "geliştirdim", "yönettim", "tasarladım", "oluşturdum", "artırdım", "azalttım", "liderlik", "koordine",
+  "uyguladım", "başlattım", "iyileştirdim", "hazırladım", "analiz ettim", "kurdum", "sağladım", "yürüttüm",
+  "geliştirilmesi", "yönetimi", "optimize",
+  "developed", "led", "managed", "designed", "built", "created", "increased", "reduced", "improved",
+  "implemented", "launched", "delivered", "achieved", "optimized", "coordinated", "analyzed", "automated",
+];
+Object.keys(SECTION_KEYS).forEach((k) => (SECTION_KEYS[k] = foldList(SECTION_KEYS[k])));
+/* İngilizce eylem fiilleri: kök + tüm çekimler (write/writes/wrote/written/writing, set, work...) */
+const EN_BASE = ("lead manage build create design develop increase reduce improve implement launch deliver achieve optimise optimize " +
+  "coordinate analyse analyze automate drive grow negotiate streamline spearhead establish execute generate mentor train supervise " +
+  "direct oversee produce write conduct organise organize plan resolve secure win save cut boost own ship migrate architect engineer " +
+  "introduce redesign restructure set work turn identify edit review check track monitor research publish maintain integrate apply " +
+  "use collaborate partner support provide diagnose prepare translate run handle prioritise prioritize shape define audit refresh " +
+  "update test measure report present pitch sell close recruit hire onboard coach teach guide advise consult facilitate host " +
+  "deploy scale refactor debug configure install document draft compile curate source procure purchase budget forecast model " +
+  "evaluate assess investigate identify map align expand open pioneer found initiate modernise modernize transform revamp " +
+  "consolidate standardise standardize simplify accelerate speed shorten lower raise double triple exceed surpass earn attract " +
+  "retain convert engage localise localize adapt plan schedule allocate delegate oversee champion influence persuade negotiate " +
+  "craft brief outline structure film shoot record photograph illustrate code program script query clean visualise visualize").split(" ");
+const EN_IRREG = "led built grew drove wrote written ran won cut set oversaw overseen spoke taught brought sought made shot began begun undertook undertaken held".split(" ");
+const EN_VERBS = new Set(EN_IRREG);
+for (const v of EN_BASE) {
+  const stem = v.endsWith("e") ? v.slice(0, -1) : v;
+  [v, v + "s", v + "es", stem + "ed", stem + "ing", v.replace(/y$/, "ied"), v.replace(/y$/, "ies"),
+   v + v.slice(-1) + "ed", v + v.slice(-1) + "ing"].forEach((f) => EN_VERBS.add(f));
+}
+const WEAK = ["sorumlu", "sorumluluğ", "görev aldım", "yardımcı oldum", "destek oldum", "ilgilendim", "katkıda bulundum",
+  "responsible for", "worked on", "helped", "assisted", "duties included", "involved in", "tasked with", "participated in"];
+
+const ACTION_F = foldList(ACTION_VERBS), WEAK_F = foldList(WEAK);
+/* Satırları bölümlere ayır */
+function splitSections(text) {
+  const out = { _all: [] };
+  let cur = "_top";
+  for (const raw of text.split("\n")) {
+    const line = raw.trim();
+    if (!line) continue;
+    const l = fold(line).replace(/[:\s]+$/, "");
+    let head = null;
+    // Başlık: kısa, rakam içermeyen, noktayla bitmeyen; tamamı büyük harf ya da en fazla 3 kelime.
+    // "PROFESSIONAL SUMMARY", "TECHNICAL SKILLS", "İŞ DENEYİMİ" gibi önekli başlıklar da tanınır.
+    const nWords = l.split(/\s+/).length;
+    const isCaps = line === line.toLocaleUpperCase("tr") && /\p{L}/u.test(line);
+    if (l.length < 40 && nWords <= 4 && !/\d/.test(l) && !/[.,;]$/.test(l) && (isCaps || nWords <= 3)) {
+      for (const [k, keys] of Object.entries(SECTION_KEYS)) {
+        if (keys.some((key) => l === key || l.startsWith(key) || new RegExp("(^|\\s|&|/)" + key).test(l))) { head = k; break; }
+      }
+    }
+    if (head) { cur = head; out[cur] = out[cur] || []; out["_h_" + head] = true; continue; }
+    (out[cur] = out[cur] || []).push(line);
+    out._all.push(line);
+  }
+  return out;
+}
+
+function detectLang(text) {
+  const l = lower(text);
+  const tr = (l.match(/[ğşıç]/g) || []).length + (l.match(/\b(ve|ile|için|bir)\b/g) || []).length * 2;
+  const en = (l.match(/\b(and|the|with|for|of)\b/g) || []).length * 2;
+  return tr >= en ? "tr" : "en";
+}
+
+/* Maddeleri çıkar ve değerlendir */
+const BULLET_RE = /^[•\-*▪●◦–·►✓➢❖■□○]\s*/;
+function extractBullets(sections) {
+  // Yalnızca deneyim maddeleri: proje/sertifika listeleri başarı maddesi gibi değerlendirilmez
+  const src = sections._h_experience ? sections.experience || [] : sections._top || [];
+  const marked = [];
+  let open = false; // önceki madde cümle ortasında mı bitti?
+  for (const line of src) {
+    if (BULLET_RE.test(line)) { marked.push(line.replace(BULLET_RE, "").trim()); open = !/[.!?;:]$/.test(line); continue; }
+    // Satır kaydırmasıyla bölünmüş maddeyi birleştir: önceki satır bitmemiş, bu satır küçük harfle başlıyor ve iletişim bilgisi değil
+    if (marked.length && open && /^[a-zçğıöşü(]/.test(line) && !/linkedin\.com|https?:|www\.|@|\.(com|net|org|de|io|tr)\b/.test(line)) {
+      marked[marked.length - 1] += " " + line;
+      open = !/[.!?;:]$/.test(line);
+    } else open = false;
+  }
+  if (marked.length) return marked.map((b) => b.replace(/\s*(https?:\/\/\S+|www\.\S+|\S*linkedin\.com\/\S*)/gi, "").trim())
+    .filter((b) => b.split(/\s+/).length >= 3).slice(0, 30);
+  // İşaret yoksa: deneyim bölümündeki uzun cümleler
+  return (sections.experience || [])
+    .filter((l) => l.split(/\s+/).length >= 8 && !/(19|20)\d{2}\s*[–—-]/.test(l))
+    .slice(0, 30);
+}
+
+function judgeBullet(b, lang) {
+  const l = fold(b);
+  const words = b.split(/\s+/).filter(Boolean);
+  const issues = [];
+  if (!/\d/.test(b)) issues.push("noNumber");
+  if (WEAK_F.some((w) => l.includes(w))) issues.push("weak");
+  else {
+    let action;
+    if (lang === "tr") {
+      const last = fold(words[words.length - 1] || "").replace(/[^\p{L}]/gu, "");
+      action = /(d[ıiuü]m|t[ıiuü]m|d[ıiuü]k|t[ıiuü]k|d[ıiuü]|t[ıiuü])$/.test(last) || ACTION_F.some((v) => l.includes(v));
+    } else {
+      const first = fold(words[0] || "").replace(/[^\p{L}]/gu, "");
+      action = EN_VERBS.has(first) || /ed$/.test(first);
+    }
+    if (!action) issues.push("noVerb");
+  }
+  if (words.length > 40) issues.push("long");
+  else if (words.length < 6) issues.push("short");
+  return issues;
+}
+
+/* Deneyim süresi (yıl) */
+const MONTHS = { ocak: 1, şubat: 2, mart: 3, nisan: 4, mayıs: 5, haziran: 6, temmuz: 7, ağustos: 8, eylül: 9, ekim: 10, kasım: 11, aralık: 12,
+  jan: 1, feb: 2, mar: 3, apr: 4, may: 5, jun: 6, jul: 7, aug: 8, sep: 9, oct: 10, nov: 11, dec: 12 };
+const MONTHS_F = Object.fromEntries(Object.entries(MONTHS).map(([k, v]) => [fold(k), v]));
+function monthOf(s) { if (!s) return null; s = fold(s); return MONTHS_F[s] || MONTHS_F[s.slice(0, 3)] || null; }
+function experienceYears(lines) {
+  const tok = "(?:(\\d{1,2})[./]|([A-Za-zÇĞİÖŞÜçğıöşü]{3,9})\\.?\\s+)?((?:19|20)\\d{2})";
+  const re = new RegExp(tok + "\\s*(?:[–—-]|to)\\s*(?:" + tok + "|(present|current|now|günümüz|halen|devam|hâlâ|şu an|today))", "giu");
+  const now = new Date(), nowM = now.getFullYear() * 12 + now.getMonth();
+  const spans = [];
+  for (const m of lines.join("\n").matchAll(re)) {
+    const sm = m[1] ? +m[1] : monthOf(m[2]) || 1;
+    const start = +m[3] * 12 + sm - 1;
+    let end;
+    if (m[7]) end = nowM;
+    else { const em = m[4] ? +m[4] : monthOf(m[5]) || 12; end = +m[6] * 12 + em - 1; }
+    if (end >= start && end - start < 600 && end <= nowM + 1) spans.push([start, end]);
+  }
+  if (!spans.length) return null;
+  spans.sort((a, b) => a[0] - b[0]);
+  let total = 0, [cs, ce] = spans[0];
+  for (const [s, e] of spans.slice(1)) { if (s <= ce) ce = Math.max(ce, e); else { total += ce - cs + 1; [cs, ce] = [s, e]; } }
+  total += ce - cs + 1;
+  return Math.round((total / 12) * 10) / 10;
+}
+
+function degreeLevel(l) {
+  if (/doktora|ph\.?\s?d/.test(l)) return 3;
+  if (/yuksek lisans|yüksek lisans|master|m\.?sc|mba\b/.test(l)) return 2;
+  if (/(^|[^n] )lisans|bachelor|b\.?sc|b\.?a\.|üniversite|university|degree|mezun|mühendisliği|fakültesi/.test(l)) return 1;
+  return 0;
+}
+
+const LANGS = {
+  english: ["ingilizce", "english"], german: ["almanca", "german", "deutsch"], french: ["fransizca", "french"],
+  spanish: ["ispanyolca", "spanish"], arabic: ["arapça", "arabic"], russian: ["rusça", "russian"],
+  italian: ["italyanca", "italian"], turkish: ["türkçe", "turkish"],
+};
+
+function requirements(jd, cvLower, sections, cvLang) {
+  const j = fold(jd), out = [];
+  // Yıl
+  const yrs = [...j.matchAll(/(?:en az|minimum|min\.?|at least)?\s*(\d{1,2})\s*\+?\s*(?:-\s*\d+\s*)?(?:yil|sene|years?|yrs)/g)]
+    .map((m) => +m[1]).filter((n) => n > 0 && n <= 20);
+  if (yrs.length) {
+    const need = Math.max(...yrs);
+    const lines = sections.experience && sections.experience.length ? sections.experience
+      : sections._all.filter((l) => !(sections.education || []).includes(l));
+    const have = experienceYears(lines);
+    out.push({ id: "years", p: { need, have }, status: have == null ? "unknown" : have + 0.25 >= need ? "ok" : "miss" });
+  }
+  // Eğitim
+  const need = degreeLevel(j);
+  if (need) out.push({ id: "degree", p: { need }, status: degreeLevel(cvLower) >= need ? "ok" : "miss" });
+  // Diller
+  const jdLang = detectLang(jd);
+  for (const [k, keys] of Object.entries(LANGS)) {
+    if (!keys.some((w) => j.includes(w))) continue;
+    if (k === "turkish" && jdLang === "tr") continue;
+    if (k === "english" && jdLang === "en") continue;
+    const ok = keys.some((w) => cvLower.includes(w)) || (k === "english" && cvLang === "en");
+    out.push({ id: "lang", p: { key: k }, status: ok ? "ok" : "miss" });
+  }
+  // Ehliyet
+  const lic = /ehliyet|sürücü belgesi|driving licen|driver'?s licen/;
+  if (lic.test(j)) out.push({ id: "license", p: {}, status: lic.test(cvLower) ? "ok" : "miss" });
+  return out;
+}
+
+function analyze(doc, jdText) {
+  const text = doc.text || "";
+  const lt = fold(text);
+  const wc = text.split(/\s+/).filter(Boolean).length;
+  const sections = splitSections(text);
+  const cvLang = detectLang(text);
+  const checks = [];
+  const add = (cat, id, status, weight, p = {}, ratio) => checks.push({ cat, id, status, weight, p, ratio });
+
+  // Format
+  add("format", "readable", wc < 50 ? "fail" : "pass", 25, { wc });
+  if (doc.multiColRatio !== undefined) {
+    const r = doc.multiColRatio;
+    if (doc.columns) add("format", "columns", "fail", 10, { two: true });
+    else add("format", "columns", r > 0.35 ? "fail" : r > 0.15 ? "warn" : "pass", 10, { pct: Math.round(r * 100) });
+  }
+  if (doc.tables !== undefined) add("format", "tables", doc.tables ? "fail" : "pass", 10, { n: doc.tables });
+  if (doc.images !== undefined) add("format", "images", doc.images ? "warn" : "pass", 5, { n: doc.images });
+  const weird = (text.match(/[\u{1F300}-\u{1FAFF}\u{2600}-\u{27BF}-�]/gu) || []).length;
+  add("format", "chars", weird > 3 ? "warn" : "pass", 4, { n: weird });
+  if (!doc.pasted) {
+    const okExt = doc.ext === "pdf" || doc.ext === "docx";
+    add("format", "format", okExt ? "pass" : "warn", 5, { ext: doc.ext });
+    const generic = /^(cv|resume|özgeçmiş|ozgecmis|document|untitled|adsız|belge|scan|tarama)[\s_\-\d()]*\.\w+$/i.test(doc.name);
+    add("format", "filename", generic ? "warn" : "pass", 3, { name: doc.name });
+    const mb = doc.size / 1024 / 1024;
+    add("format", "filesize", mb <= 2 ? "pass" : "warn", 3, { mb: mb.toFixed(mb < 1 ? 2 : 1) });
+  }
+
+  // Yapı
+  const email = /[\w.+-]+@[\w-]+\.[\w.-]+/.test(text);
+  const phone = /(\+?\d[\d\s().-]{8,}\d)/.test(text);
+  const li = /linkedin\.com\/in\//i.test(text);
+  const missC = [!email && "email", !phone && "phone"].filter(Boolean);
+  add("structure", "contact", missC.length === 0 ? "pass" : missC.length === 2 ? "fail" : "warn", 12, { li, missing: missC });
+  if (!li && wc >= 50) add("structure", "linkedin", "warn", 2);
+  const secs = ["summary", "experience", "education", "skills"];
+  const foundSec = secs.filter((s) => sections["_h_" + s]);
+  const missSec = secs.filter((s) => !sections["_h_" + s]);
+  add("structure", "sections", !missSec.length ? "pass" : missSec.length >= 2 ? "fail" : "warn", 15, { found: foundSec, missing: missSec });
+  if (wc >= 50) add("structure", "length", wc < 250 || wc > 1200 ? "warn" : "pass", 6, { wc, short: wc < 250 });
+  if (doc.pages && doc.pages > 2) add("structure", "pages", "warn", 3, { n: doc.pages });
+  const dates = (text.match(/\b((0?[1-9]|1[0-2])[./](19|20)\d{2}|(19|20)\d{2})\b/g) || []).length;
+  add("structure", "dates", dates >= 2 ? "pass" : "warn", 5, { n: dates });
+
+  // İçerik
+  const bullets = extractBullets(sections).map((b) => ({ text: b, issues: judgeBullet(b, cvLang) }));
+  const badBullets = bullets.filter((b) => b.issues.length);
+  if (bullets.length >= 3) {
+    // Orantılı puan: maddelerin ne kadarı sayı içeriyor / eylem odaklı
+    const n = bullets.length;
+    const without = bullets.filter((b) => b.issues.includes("noNumber")).length;
+    const weakN = bullets.filter((b) => b.issues.includes("weak") || b.issues.includes("noVerb")).length;
+    const numR = (n - without) / n, verbR = (n - weakN) / n;
+    add("content", "bulletNumbers", numR >= 0.7 ? "pass" : "warn", 15, { total: n, without }, numR);
+    add("content", "bulletVerbs", verbR >= 0.85 ? "pass" : "warn", 10, { total: n, bad: weakN }, verbR);
+  } else {
+    // Madde yoksa CV geneline bak
+    const metrics = (text.match(/\d+\s?%|%\s?\d+|\d+[.,]?\d*\s?(k|m|bin|milyon|million|tl|₺|\$|€|£|kişi|users|kullanıcı|customers|müşteri)\b/gi) || []).length;
+    add("content", "metrics", metrics >= 3 ? "pass" : "warn", 12, { n: metrics }, Math.min(1, metrics / 5));
+    const verbs = ACTION_VERBS.filter((v, i) => lt.includes(ACTION_F[i]));
+    add("content", "verbs", verbs.length >= 4 ? "pass" : "warn", 8, { list: verbs.slice(0, 6).join(", ") }, Math.min(1, verbs.length / 5));
+  }
+  if (!jdText.trim()) add("info", "jd", "warn", 0);
+
+  // Puanlar
+  const score = (list) => {
+    const w = list.reduce((s, c) => s + c.weight, 0);
+    const g = list.reduce((s, c) => s + c.weight * (c.ratio != null ? c.ratio : c.status === "pass" ? 1 : c.status === "warn" ? 0.5 : 0), 0);
+    return w ? Math.round((g / w) * 100) : 100;
+  };
+  let ats = score(checks);
+  if (wc < 50) ats = Math.min(ats, 20);
+  const kw = jdText.trim() ? matchKeywords(jdText, lt) : null;
+  const reqs = jdText.trim() ? requirements(jdText, lt, sections, cvLang) : null;
+  const total = kw ? Math.round(ats * 0.7 + kw.pct * 0.3) : ats;
+  const subs = {
+    format: score(checks.filter((c) => c.cat === "format")),
+    structure: score(checks.filter((c) => c.cat === "structure")),
+    content: score(checks.filter((c) => c.cat === "content")),
+  };
+  if (kw) subs.keywords = kw.pct;
+
+  return { doc, checks, score: total, subs, wc, kw, reqs, bullets, badBullets };
+}
+
+/* İş ilanı anahtar kelimeleri */
+const STOP = new Set((
+  "ve veya ile için bir bu şu o da de ki mi gibi olan olarak daha çok en her tüm ise ama fakat ancak " +
+  "sahip olmak olması tercihen tercih bilgi bilgisi iyi düzeyde yıl yıllık deneyim deneyimli tecrübe " +
+  "aday adaylar arıyoruz ekibimize katılacak pozisyon görev sorumluluklar nitelikler aranan konusunda " +
+  "en az minimum üzerinde içinde kadar sonra önce ayrıca yeni yapmak etmek edebilecek yapabilecek " +
+  "bilen bilgili tecrübeli şart şarttır sebebi sebebidir aranıyor arıyor olmalı " +
+  "konularında alanında alanda güçlü yüksek derecede kullanabilen hakim hâkim çalışacak " +
+  "the and or for with a an to of in on at by is are be as we you our your will can from that this " +
+  "have has years year experience strong good excellent ability knowledge skills skill work working " +
+  "team role position candidate required requirements preferred plus etc including such using use " +
+  "who what where when about into within across their they them it its must should would looking join " +
+  "bachelor bachelors degree master masters fluent fluency native lisans mezun mezunu ehliyet " +
+  "bölüm bölümü bölümünden sınıf sınıfı ingilizce almanca fransızca english german french spanish licence license"
+).split(" ").map(fold));
+
+function tokenize(s) {
+  return lower(s).replace(/[^\p{L}\p{N}+#./\s-]/gu, " ").split(/\s+/)
+    .map((w) => w.replace(/^[.\-/]+|[.\-/]+$/g, ""))
+    .filter((w) => w.length > 1 && !STOP.has(fold(w)) && !/^\d+$/.test(w));
+}
+
+function matchKeywords(jd, cvLower) {
+  const toks = tokenize(jd);
+  const freq = new Map();
+  toks.forEach((t) => freq.set(t, (freq.get(t) || 0) + 1));
+  // İki kelimelik ifadeler (ör. "keyword research") 2+ kez geçiyorsa tek kelimelerden önce gelir
+  for (let i = 0; i < toks.length - 1; i++) { const bi = toks[i] + " " + toks[i + 1]; freq.set(bi, (freq.get(bi) || 0) + 1); }
+  const ranked = [...freq.entries()]
+    .filter(([k, v]) => (k.includes(" ") ? v >= 2 : k.length > 2))
+    .map(([k, v]) => [k, k.includes(" ") ? v * 1.5 : v])
+    .sort((a, b) => b[1] - a[1]);
+  const picked = [];
+  for (const [k] of ranked) {
+    if (picked.length >= 30) break;
+    if (picked.some((p) => p.includes(k) || k.includes(p))) continue;
+    picked.push(k);
+  }
+  const has = (k) => { const f = fold(k); return cvLower.includes(f) || (f.length > 6 && !f.includes(" ") && cvLower.includes(f.slice(0, 5))); };
+  const found = picked.filter(has), missing = picked.filter((k) => !has(k));
+  return { found, missing, pct: picked.length ? Math.round((found.length / picked.length) * 100) : 0 };
+}
+
+/* =========================================================
+   Gösterim
+   ========================================================= */
+const lvlOf = (s) => (s >= 80 ? "ok" : s >= 55 ? "warn" : "bad");
+
+function checkText(c) {
+  const d = T().checks[c.id];
+  const title = typeof d.t === "string" ? d.t : d.t[c.status] || Object.values(d.t)[0];
+  const p = { ...c.p };
+  if (c.id === "contact") p.missing = c.p.missing.map((k) => T().contactItems[k]).join(", ");
+  if (c.id === "sections") p.list = (c.status === "pass" ? c.p.found : c.p.missing).map((k) => T().sec[k]).join(", ");
+  return { title, detail: d[c.status](p) };
+}
+
+function render(r, animate) {
+  const t = T();
+  $("results").classList.remove("hidden");
+  if (animate) $("results").querySelectorAll(".fade").forEach((el) => { el.style.animation = "none"; el.offsetHeight; el.style.animation = ""; });
+
+  // Puan
+  const lvl = lvlOf(r.score);
+  $("resTitle").textContent = r.kw ? t.resTitleJd : t.resTitle;
+  $("resSub").textContent = r.kw ? t.resSubJd : t.resSub;
+  const bar = $("gaugeBar");
+  bar.style.stroke = `var(--${lvl === "bad" ? "bad" : lvl})`;
+  const target = 427.3 * (1 - r.score / 100);
+  if (animate) {
+    bar.style.strokeDashoffset = 427.3;
+    setTimeout(() => (bar.style.strokeDashoffset = target), 30);
+    countUp($("score"), r.score);
+  } else { bar.style.strokeDashoffset = target; $("score").textContent = r.score; }
+  $("badge").className = "badge " + lvl;
+  $("badge").textContent = (r.kw ? t.lvlJd : t.lvl)[lvl];
+  $("verdict").textContent = t.verdict[lvl];
+  $("stats").textContent = `${r.wc} ${t.words}` + (r.doc.pages ? ` · ${r.doc.pages} ${t.pages}` : "") + (r.doc.pasted ? ` · ${t.pastedText}` : ` · .${r.doc.ext.toUpperCase()}`);
+  $("subscores").innerHTML = Object.entries(r.subs).map(([k, v]) =>
+    `<div class="sub-row"><div class="top"><span>${t.sub[k]}</span><span>${v}</span></div><div class="meter"><i class="${k === "keywords" ? "acc" : lvlOf(v)}" data-w="${v}"></i></div></div>`).join("");
+  const setW = () => $("subscores").querySelectorAll("i").forEach((i) => (i.style.width = i.dataset.w + "%"));
+  animate ? setTimeout(setW, 30) : setW();
+
+  // Düzeltmeler
+  const order = { fail: 0, warn: 1 };
+  // Etki = kaybedilen puan; ilan önerisi kritiklerden sonra ilk sırada
+  const lost = (c) => (c.id === "jd" ? 999 : c.weight * (1 - (c.ratio != null ? c.ratio : c.status === "warn" ? 0.5 : 0)));
+  const fixes = r.checks.filter((c) => c.status !== "pass").sort((a, b) => order[a.status] - order[b.status] || lost(b) - lost(a));
+  $("fixes").innerHTML = fixes.length ? fixes.map((c, i) => {
+    const x = checkText(c);
+    return `<div class="fix ${c.status}"><div class="num">${i + 1}</div><div><span class="tag ${c.status}">${t.prio[c.id === "jd" ? "info" : c.status]}</span><strong>${esc(x.title)}</strong><p>${esc(x.detail)}</p></div></div>`;
+  }).join("") : `<div class="all-good">${t.noFixes}</div>`;
+  const passed = r.checks.filter((c) => c.status === "pass");
+  $("passed").innerHTML = passed.length ? `<details class="passed"><summary>${t.passedN(passed.length)}</summary><ul>${passed.map((c) => {
+    const x = checkText(c); return `<li><span><b>${esc(x.title)}</b> · ${esc(x.detail)}</span></li>`;
+  }).join("")}</ul></details>` : "";
+
+  // Maddeler
+  $("bulletsSub").textContent = t.bulletsSub(r.badBullets.length, r.bullets.length);
+  if (!r.bullets.length) $("bullets").innerHTML = `<div class="no-jd">${t.noBullets}</div>`;
+  else if (!r.badBullets.length) $("bullets").innerHTML = `<div class="all-good">${t.bulletsGood}</div>`;
+  else $("bullets").innerHTML = r.badBullets.map((b) => `
+    <div class="bullet">
+      <div class="txt">${esc(b.text)}</div>
+      <div class="flags">${b.issues.map((i) => `<span class="flag">${t.flag[i]}</span>`).join("")}</div>
+      <div class="tip"><b>${t.tipLabel}</b> ${b.issues.map((i) => t.tip[i]).join(" ")}</div>
+    </div>`).join("");
+
+  // Beceriler
+  if (r.kw) {
+    $("skills").innerHTML = `<p class="muted">${t.skillsS}</p>
+      <div class="match"><span class="pct">${pct(r.kw.pct)}</span><div class="meter"><i class="acc" data-w="${r.kw.pct}"></i></div></div>
+      <div class="kw-label" style="color:var(--bad)">${t.missing} (${r.kw.missing.length})</div>
+      <div class="chips">${r.kw.missing.map((k) => `<span class="chip miss">${esc(k)}</span>`).join("") || `<span class="muted">${t.noMissing}</span>`}</div>
+      <div class="kw-label" style="color:var(--ok)">${t.found} (${r.kw.found.length})</div>
+      <div class="chips">${r.kw.found.map((k) => `<span class="chip hit">${esc(k)}</span>`).join("") || `<span class="muted">${t.noFound}</span>`}</div>`;
+    const kwBar = $("skills").querySelector(".meter i");
+    animate ? setTimeout(() => (kwBar.style.width = r.kw.pct + "%"), 30) : (kwBar.style.width = r.kw.pct + "%");
+  } else $("skills").innerHTML = `<div class="no-jd" style="margin-top:10px">${t.noJd}</div>`;
+
+  // Gereksinimler
+  if (!r.reqs) $("reqs").innerHTML = `<div class="no-jd" style="margin-top:10px">${t.noJd}</div>`;
+  else if (!r.reqs.length) $("reqs").innerHTML = `<div class="no-jd" style="margin-top:10px">${t.noReq}</div>`;
+  else $("reqs").innerHTML = `<div style="margin-top:8px">` + r.reqs.map((q) => {
+    const d = t.req[q.id];
+    const p = { ...q.p, name: q.p.key ? t.langNames[q.p.key] : "" };
+    return `<div class="req"><div><strong>${esc(d.t(p))}</strong><p>${esc(d[q.status](p))}</p></div><span class="pill ${q.status}">${t.pill[q.status]}</span></div>`;
+  }).join("") + `</div>`;
+
+  $("rawText").textContent = r.doc.text.trim() || t.noText;
+  if (animate) $("results").scrollIntoView({ behavior: "smooth" });
+}
+
+function countUp(el, to) {
+  // Zamanlayıcıyla çalışır; sekme arka plandaysa bile son değer mutlaka yazılır
+  const start = Date.now(), dur = 900;
+  clearInterval(el._t);
+  el._t = setInterval(() => {
+    const k = Math.min(1, (Date.now() - start) / dur);
+    el.textContent = Math.round(to * (1 - Math.pow(1 - k, 3)));
+    if (k >= 1) clearInterval(el._t);
+  }, 16);
+  setTimeout(() => { clearInterval(el._t); el.textContent = to; }, dur + 100);
+}
+const pct = (n) => (LANG === "tr" ? "%" + n : n + "%");
+function esc(s) { return String(s).replace(/[&<>"]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c])); }
+
+applyI18n();
+</script>
+</body>
+</html>
