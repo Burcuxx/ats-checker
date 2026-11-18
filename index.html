@@ -416,7 +416,12 @@ const I18N = {
       lang: { t: (p) => `${p.name} dil bilgisi`, ok: () => "CV'nizde geçiyor.", miss: () => "CV'nizde bulunamadı. Varsa seviyesiyle birlikte ekleyin (ör. İngilizce – C1)." },
       license: { t: () => "Sürücü belgesi", ok: () => "CV'nizde geçiyor.", miss: () => "CV'nizde bulunamadı. Varsa sınıfıyla ekleyin (ör. B sınıfı ehliyet)." },
     },
-    langNames: { english: "İngilizce", german: "Almanca", french: "Fransızca", spanish: "İspanyolca", arabic: "Arapça", russian: "Rusça", italian: "İtalyanca", turkish: "Türkçe" },
+    langNames: { english: "İngilizce", german: "Almanca", french: "Fransızca", spanish: "İspanyolca", arabic: "Arapça", russian: "Rusça", italian: "İtalyanca", turkish: "Türkçe",
+      swedish: "İsveççe", norwegian: "Norveççe", danish: "Danca", finnish: "Fince", dutch: "Felemenkçe", portuguese: "Portekizce", polish: "Lehçe",
+      czech: "Çekçe", hungarian: "Macarca", romanian: "Rumence", greek: "Yunanca", bulgarian: "Bulgarca", ukrainian: "Ukraynaca", japanese: "Japonca",
+      chinese: "Çince", korean: "Korece", hindi: "Hintçe", hebrew: "İbranice", persian: "Farsça", azerbaijani: "Azerice", kurdish: "Kürtçe" },
+    reqMissing: (x) => `Eksik: ${x}`,
+    reqMissingD: "İlanda isteniyor ama CV'nizde bulunamadı. Bu gereksinimi karşılıyorsanız CV'nizde açıkça yazın; ATS ve işe alımcılar genellikle bununla filtreler.",
     reportT: "Raporunuz",
     reportS: "Sonuçları PDF olarak kaydedip daha sonra karşılaştırabilirsiniz.",
     reportBtn: "PDF olarak kaydet",
@@ -540,7 +545,12 @@ const I18N = {
       lang: { t: (p) => `${p.name} language skills`, ok: () => "Mentioned in your CV.", miss: () => "Not found in your CV. If you have it, add it with your level (e.g. German – B2)." },
       license: { t: () => "Driving licence", ok: () => "Mentioned in your CV.", miss: () => "Not found in your CV. If you have one, add it." },
     },
-    langNames: { english: "English", german: "German", french: "French", spanish: "Spanish", arabic: "Arabic", russian: "Russian", italian: "Italian", turkish: "Turkish" },
+    langNames: { english: "English", german: "German", french: "French", spanish: "Spanish", arabic: "Arabic", russian: "Russian", italian: "Italian", turkish: "Turkish",
+      swedish: "Swedish", norwegian: "Norwegian", danish: "Danish", finnish: "Finnish", dutch: "Dutch", portuguese: "Portuguese", polish: "Polish",
+      czech: "Czech", hungarian: "Hungarian", romanian: "Romanian", greek: "Greek", bulgarian: "Bulgarian", ukrainian: "Ukrainian", japanese: "Japanese",
+      chinese: "Chinese", korean: "Korean", hindi: "Hindi", hebrew: "Hebrew", persian: "Persian", azerbaijani: "Azerbaijani", kurdish: "Kurdish" },
+    reqMissing: (x) => `Missing: ${x}`,
+    reqMissingD: "The ad asks for this but it wasn't found in your CV. If you meet it, state it clearly; ATS filters and recruiters often screen on it.",
     reportT: "Your report",
     reportS: "Save the results as a PDF to compare later.",
     reportBtn: "Save as PDF",
@@ -930,11 +940,33 @@ function degreeLevel(l) {
   return 0;
 }
 
+/* Diller: Türkçe ad, İngilizce ad ve dilin kendi adı (kelime sınırıyla aranır) */
 const LANGS = {
-  english: ["ingilizce", "english"], german: ["almanca", "german", "deutsch"], french: ["fransizca", "french"],
-  spanish: ["ispanyolca", "spanish"], arabic: ["arapça", "arabic"], russian: ["rusça", "russian"],
-  italian: ["italyanca", "italian"], turkish: ["türkçe", "turkish"],
+  english: ["ingilizce", "english"], german: ["almanca", "german", "deutsch"], french: ["fransizca", "french", "français", "francais"],
+  spanish: ["ispanyolca", "spanish", "español", "espanol"], arabic: ["arapça", "arabic"], russian: ["rusça", "russian"],
+  italian: ["italyanca", "italian", "italiano"], turkish: ["türkçe", "turkish"],
+  swedish: ["isveççe", "swedish", "svenska"], norwegian: ["norveççe", "norwegian", "norsk"], danish: ["danca", "danish", "dansk"],
+  finnish: ["fince", "finnish", "suomi"], dutch: ["felemenkçe", "hollandaca", "dutch", "nederlands", "flemish"],
+  portuguese: ["portekizce", "portuguese", "português", "portugues"], polish: ["lehçe", "polski"],
+  czech: ["çekçe", "czech"], hungarian: ["macarca", "hungarian"], romanian: ["rumence", "romanian"],
+  greek: ["yunanca", "greek"], bulgarian: ["bulgarca", "bulgarian"], ukrainian: ["ukraynaca", "ukrainian"],
+  japanese: ["japonca", "japanese"], chinese: ["çince", "chinese", "mandarin", "cantonese"], korean: ["korece", "korean"],
+  hindi: ["hintçe", "hindi"], hebrew: ["ibranice", "hebrew"], persian: ["farsça", "persian", "farsi"],
+  azerbaijani: ["azerice", "azerbaijani"], kurdish: ["kürtçe", "kurdish"],
 };
+Object.keys(LANGS).forEach((k) => (LANGS[k] = foldList(LANGS[k])));
+
+// "Polish" dil mi fiil mi? Cümle başındaysa veya "your/the/up" ile devam ediyorsa fiildir
+function polishLang(text) {
+  for (const m of text.matchAll(/\bPolish\b/g)) {
+    const before = text.slice(0, m.index).trimEnd();
+    const after = text.slice(m.index + 6).trimStart().toLowerCase();
+    if (!before || /[.!?:;•\-–\n]$/.test(before)) continue;
+    if (/^(your|the|our|up|off|and refine)\b/.test(after)) continue;
+    return true;
+  }
+  return false;
+}
 
 function requirements(jd, cvLower, sections, cvLang) {
   const j = fold(jd), out = [];
@@ -954,10 +986,12 @@ function requirements(jd, cvLower, sections, cvLang) {
   // Diller
   const jdLang = detectLang(jd);
   for (const [k, keys] of Object.entries(LANGS)) {
-    if (!keys.some((w) => j.includes(w))) continue;
+    // "Polish" aynı zamanda "parlatmak" fiili: yalnızca büyük harfle yazıldıysa dil sayılır
+    const inJd = keys.some((w) => hasTerm(j, w)) || (k === "polish" && polishLang(jd));
+    if (!inJd) continue;
     if (k === "turkish" && jdLang === "tr") continue;
     if (k === "english" && jdLang === "en") continue;
-    const ok = keys.some((w) => cvLower.includes(w)) || (k === "english" && cvLang === "en");
+    const ok = keys.some((w) => hasTerm(cvLower, w)) || (k === "polish" && /polish/.test(cvLower)) || (k === "english" && cvLang === "en");
     out.push({ id: "lang", p: { key: k }, status: ok ? "ok" : "miss" });
   }
   // Ehliyet
@@ -1189,10 +1223,18 @@ function render(r, animate) {
   // Etki = kaybedilen puan; ilan önerisi kritiklerden sonra ilk sırada
   const lost = (c) => (c.id === "jd" ? 999 : c.weight * (1 - (c.ratio != null ? c.ratio : c.status === "warn" ? 0.5 : 0)));
   const fixes = r.checks.filter((c) => c.status !== "pass").sort((a, b) => order[a.status] - order[b.status] || lost(b) - lost(a));
-  $("fixes").innerHTML = fixes.length ? fixes.map((c, i) => {
-    const x = checkText(c);
-    return `<div class="fix ${c.status}"><div class="num">${i + 1}</div><div><span class="tag ${c.status}">${t.prio[c.id === "jd" ? "info" : c.status]}</span><strong>${esc(x.title)}</strong><p>${esc(x.detail)}</p></div></div>`;
-  }).join("") : `<div class="all-good">${t.noFixes}</div>`;
+  // İlanda istenip CV'de bulunmayan gereksinimler (dil, deneyim yılı, eğitim, ehliyet): kritiklerden hemen sonra
+  const reqFixes = (r.reqs || []).filter((q) => q.status === "miss").map((q) => {
+    const d = t.req[q.id], p = { ...q.p, name: q.p.key ? t.langNames[q.p.key] : "" };
+    const name = q.id === "lang" ? p.name : d.t(p);
+    return { status: "warn", tag: t.prio.warn, title: t.reqMissing(name), detail: q.id === "years" ? d.miss(p) : t.reqMissingD };
+  });
+  const items = fixes.map((c) => { const x = checkText(c); return { status: c.status, tag: t.prio[c.id === "jd" ? "info" : c.status], title: x.title, detail: x.detail }; });
+  const nFail = items.filter((x) => x.status === "fail").length;
+  items.splice(nFail, 0, ...reqFixes);
+  $("fixes").innerHTML = items.length ? items.map((x, i) =>
+    `<div class="fix ${x.status}"><div class="num">${i + 1}</div><div><span class="tag ${x.status}">${x.tag}</span><strong>${esc(x.title)}</strong><p>${esc(x.detail)}</p></div></div>`
+  ).join("") : `<div class="all-good">${t.noFixes}</div>`;
   const passed = r.checks.filter((c) => c.status === "pass");
   $("passed").innerHTML = passed.length ? `<details class="passed"><summary>${t.passedN(passed.length)}</summary><ul>${passed.map((c) => {
     const x = checkText(c); return `<li><span><b>${esc(x.title)}</b> · ${esc(x.detail)}</span></li>`;
