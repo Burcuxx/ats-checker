@@ -3,24 +3,74 @@
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>ATS CV Checker</title>
+<title>Free ATS CV Checker &amp; Resume Scanner | Check Your CV Online</title>
+<meta name="description" content="Free ATS CV checker and resume scanner. Upload your CV to get an ATS score, a prioritised list of fixes, weak bullets to rewrite and keyword matching against the job ad. Runs in your browser; your file is never uploaded." />
+<link rel="canonical" href="https://burcuxx.github.io/ats-checker/" />
+<link rel="alternate" hreflang="en" href="https://burcuxx.github.io/ats-checker/" />
+<link rel="alternate" hreflang="tr" href="https://burcuxx.github.io/ats-checker/?lang=tr" />
+<link rel="alternate" hreflang="x-default" href="https://burcuxx.github.io/ats-checker/" />
+<meta name="robots" content="index, follow" />
 <link rel="icon" type="image/svg+xml" href="favicon.svg" />
 <link rel="apple-touch-icon" href="apple-touch-icon.png" />
 <meta name="theme-color" content="#4f46e5" />
-<link rel="preconnect" href="https://fonts.googleapis.com" />
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
-<script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/mammoth/1.6.0/mammoth.browser.min.js"></script>
+<!-- Paylaşım önizlemesi (LinkedIn, WhatsApp, X, Facebook) -->
+<meta property="og:type" content="website" />
+<meta property="og:site_name" content="ATS CV Checker" />
+<meta property="og:title" content="Free ATS CV Checker &amp; Resume Scanner" />
+<meta property="og:description" content="Get an ATS score, a prioritised list of fixes and keyword matching against the job ad. Free, no sign-up, your CV never leaves your browser." />
+<meta property="og:url" content="https://burcuxx.github.io/ats-checker/" />
+<meta property="og:image" content="https://burcuxx.github.io/ats-checker/og-image.png" />
+<meta property="og:image:width" content="1200" />
+<meta property="og:image:height" content="630" />
+<meta property="og:image:alt" content="ATS CV Checker: score, fixes and keyword match for your CV" />
+<meta property="og:locale" content="en_US" />
+<meta property="og:locale:alternate" content="tr_TR" />
+<meta name="twitter:card" content="summary_large_image" />
+<meta name="twitter:title" content="Free ATS CV Checker &amp; Resume Scanner" />
+<meta name="twitter:description" content="ATS score, prioritised fixes and job-ad keyword matching. Free and private." />
+<meta name="twitter:image" content="https://burcuxx.github.io/ats-checker/og-image.png" />
+<!-- PDF/DOCX okuyucular CV yüklenince indirilir; sayfa açılışını yavaşlatmasın diye yalnızca bağlantı önceden hazırlanır -->
+<link rel="preconnect" href="https://cdnjs.cloudflare.com" />
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "WebApplication",
+      "name": "ATS CV Checker",
+      "url": "https://burcuxx.github.io/ats-checker/",
+      "description": "Free ATS CV checker and resume scanner. Upload your CV to get an ATS score, a prioritised list of fixes, weak bullets to rewrite and keyword matching against the job ad. Runs in your browser; your file is never uploaded.",
+      "applicationCategory": "BusinessApplication",
+      "operatingSystem": "Any",
+      "browserRequirements": "Requires JavaScript",
+      "inLanguage": ["en", "tr"],
+      "isAccessibleForFree": true,
+      "offers": { "@type": "Offer", "price": "0", "priceCurrency": "EUR" },
+      "featureList": ["ATS compatibility score", "Two-column layout detection", "Prioritised fixes", "Bullet point analysis", "Job ad keyword matching", "Language requirement check"]
+    },
+    {
+      "@type": "FAQPage",
+      "mainEntity": [
+        { "@type": "Question", "name": "Is the CV checker free?", "acceptedAnswer": { "@type": "Answer", "text": "Yes. No sign-up or payment needed." } },
+        { "@type": "Question", "name": "Is my CV uploaded to a server?", "acceptedAnswer": { "@type": "Answer", "text": "No. Your file is processed entirely in your browser and is never sent anywhere." } },
+        { "@type": "Question", "name": "What is an ATS?", "acceptedAnswer": { "@type": "Answer", "text": "An Applicant Tracking System is software companies use to collect applications, extract information from CVs and search for candidates. Workday, Greenhouse and Lever are common examples." } },
+        { "@type": "Question", "name": "How is the score calculated?", "acceptedAnswer": { "@type": "Answer", "text": "Checks such as readability, layout, sections and contact details are scored by weight. Bullets are scored proportionally. If you add a job ad, keyword match makes up 30% of the score." } },
+        { "@type": "Question", "name": "Should I send a PDF or a Word file?", "acceptedAnswer": { "@type": "Answer", "text": "Both work in most ATS. What matters is that the PDF contains real text (not a scan) and uses a simple single-column layout." } }
+      ]
+    }
+  ]
+}
+</script>
 <style>
 :root {
-  --bg: #f5f6fb; --bg-2: #eef0fa; --card: #ffffff; --text: #151a2d; --muted: #687089; --faint: #9aa1b5;
+  --bg: #f5f6fb; --bg-2: #eef0fa; --card: #ffffff; --text: #151a2d; --muted: #5d6580; --faint: #646b85; --on-accent: #ffffff;
   --border: #e4e7f1; --accent: #4f46e5; --accent-2: #7c3aed; --accent-soft: #eef0ff;
-  --ok: #16a34a; --ok-soft: #e8f7ee; --warn: #d97706; --warn-soft: #fdf3e2; --bad: #dc2626; --bad-soft: #fdecec;
+  --ok: #15803d; --ok-soft: #e8f7ee; --warn: #a1500a; --warn-soft: #fdf3e2; --bad: #b91c1c; --bad-soft: #fdecec;
   --shadow: 0 1px 2px rgba(20,24,50,.04), 0 8px 24px rgba(20,24,50,.06); --radius: 16px;
 }
 @media (prefers-color-scheme: dark) {
   :root {
-    --bg: #0d1020; --bg-2: #12162a; --card: #161a2f; --text: #e9ecf8; --muted: #9ba3c0; --faint: #6b7392;
+    --bg: #0d1020; --bg-2: #12162a; --card: #161a2f; --text: #e9ecf8; --muted: #a3abc7; --faint: #8e96b4; --on-accent: #0d1020;
     --border: #262b45; --accent: #818cf8; --accent-2: #a78bfa; --accent-soft: #1e2246;
     --ok: #4ade80; --ok-soft: #12291d; --warn: #fbbf24; --warn-soft: #2d2412; --bad: #f87171; --bad-soft: #301617;
     --shadow: 0 1px 2px rgba(0,0,0,.3), 0 8px 24px rgba(0,0,0,.25);
@@ -49,7 +99,7 @@ body {
 .privacy { display: inline-flex; align-items: center; gap: 6px; font-size: 13px; color: var(--muted); background: var(--card); border: 1px solid var(--border); padding: 6px 12px; border-radius: 999px; }
 .lang { display: inline-flex; background: var(--card); border: 1px solid var(--border); border-radius: 999px; padding: 3px; }
 .lang button { font: inherit; font-size: 12px; font-weight: 700; border: 0; background: none; color: var(--muted); padding: 4px 10px; border-radius: 999px; cursor: pointer; }
-.lang button.on { background: var(--accent); color: #fff; }
+.lang button.on { background: var(--accent); color: var(--on-accent); }
 @media (max-width: 560px) { .privacy { display: none; } }
 
 /* Hero */
@@ -59,7 +109,7 @@ body {
 .hero h1 { margin: 0 0 12px; font-size: clamp(30px, 4.8vw, 46px); line-height: 1.08; letter-spacing: -.03em; font-weight: 800; }
 .hero h1 span { background: linear-gradient(90deg, var(--accent), var(--accent-2)); -webkit-background-clip: text; background-clip: text; color: transparent; }
 .hero p { margin: 0; color: var(--muted); font-size: 16px; }
-.hero-box h3 { margin: 0 0 10px; font-size: 14px; }
+.hero-box h2 { margin: 0 0 10px; font-size: 14px; }
 .ticks { list-style: none; margin: 0; padding: 0; display: grid; gap: 8px; }
 .ticks li { display: flex; gap: 10px; font-size: 14px; color: var(--muted); }
 .ticks li::before { content: "✓"; flex: none; width: 20px; height: 20px; border-radius: 50%; background: var(--ok-soft); color: var(--ok); display: grid; place-items: center; font-size: 11px; font-weight: 800; }
@@ -86,7 +136,7 @@ textarea { width: 100%; resize: vertical; min-height: 176px; font: inherit; font
 textarea:focus { border-color: var(--accent); box-shadow: 0 0 0 3px var(--accent-soft); }
 .hint { font-size: 12px; color: var(--faint); margin-top: 6px; }
 .run-row { display: flex; align-items: center; gap: 14px; margin-top: 20px; flex-wrap: wrap; }
-.run { display: inline-flex; align-items: center; justify-content: center; gap: 8px; font: inherit; font-weight: 600; font-size: 15px; color: #fff; border: 0; border-radius: 12px; padding: 13px 26px; background: linear-gradient(135deg, var(--accent), var(--accent-2)); cursor: pointer; box-shadow: 0 6px 18px color-mix(in srgb, var(--accent) 35%, transparent); transition: .15s; }
+.run { display: inline-flex; align-items: center; justify-content: center; gap: 8px; font: inherit; font-weight: 600; font-size: 15px; color: var(--on-accent); border: 0; border-radius: 12px; padding: 13px 26px; background: linear-gradient(135deg, var(--accent), var(--accent-2)); cursor: pointer; box-shadow: 0 6px 18px color-mix(in srgb, var(--accent) 35%, transparent); transition: .15s; }
 .run:hover:not(:disabled) { transform: translateY(-1px); }
 .run:disabled { opacity: .45; cursor: not-allowed; box-shadow: none; }
 @media (max-width: 560px) { .run { width: 100%; } }
@@ -207,23 +257,23 @@ footer { text-align: center; color: var(--faint); font-size: 12px; padding: 40px
 <div class="wrap">
   <nav class="nav">
     <div class="logo"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg></div>
-    <div class="brand" data-i18n="brand"></div>
+    <div class="brand" data-i18n="brand">ATS Checker</div>
     <div class="nav-right">
-      <div class="privacy"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg><span data-i18n="privacy"></span></div>
+      <div class="privacy"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg><span data-i18n="privacy">Your file never leaves your device</span></div>
       <div class="lang" id="lang"><button data-l="tr">TR</button><button data-l="en">EN</button></div>
     </div>
   </nav>
 
   <header class="hero">
     <div>
-      <span class="eyebrow" data-i18n="eyebrow"></span>
-      <h1><span data-i18n="h1a"></span> <span data-i18n="h1b"></span></h1>
-      <p data-i18n="heroP"></p>
+      <span class="eyebrow" data-i18n="eyebrow">Free · No sign-up</span>
+      <h1><span data-i18n="h1a">ATS CV checker</span> <span data-i18n="h1b">and resume scanner</span></h1>
+      <p data-i18n="heroP">Check your CV before you apply. See what hiring software reads, what it misses, and how well you match the job ad.</p>
     </div>
     <div class="card hero-box">
-      <h3 data-i18n="heroBoxT"></h3>
+      <h2 data-i18n="heroBoxT">What you get</h2>
       <ul class="ticks">
-        <li data-i18n="tick1"></li><li data-i18n="tick2"></li><li data-i18n="tick3"></li><li data-i18n="tick4"></li>
+        <li data-i18n="tick1">An ATS score with sub-scores</li><li data-i18n="tick2">A list of fixes, in order of impact</li><li data-i18n="tick3">CV bullets that need strengthening</li><li data-i18n="tick4">A comparison with the skills and requirements in the ad</li>
       </ul>
     </div>
   </header>
@@ -232,35 +282,35 @@ footer { text-align: center; color: var(--faint); font-size: 12px; padding: 40px
   <section class="card" id="inputCard">
     <div class="inputs">
       <div>
-        <div class="label"><span data-i18n="yourCv"></span>
-          <div class="seg" id="mode"><button data-m="file" class="on" data-i18n="upload"></button><button data-m="paste" data-i18n="paste"></button></div>
+        <div class="label"><span data-i18n="yourCv">Your CV</span>
+          <div class="seg" id="mode"><button data-m="file" class="on" data-i18n="upload">Upload file</button><button data-m="paste" data-i18n="paste">Paste text</button></div>
         </div>
         <div id="fileMode">
           <label id="drop" class="drop" for="file">
             <input id="file" type="file" accept=".pdf,.docx,.txt" hidden />
             <div class="ic"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><path d="M17 8l-5-5-5 5"/><path d="M12 3v12"/></svg></div>
-            <strong data-i18n="dropT"></strong>
-            <span data-i18n="dropS"></span>
+            <strong data-i18n="dropT">Drag a file here or browse</strong>
+            <span data-i18n="dropS">PDF, DOCX or TXT</span>
           </label>
           <div id="fileBox" class="file hidden">
             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="color:var(--accent);flex:none"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6"/></svg>
             <div style="min-width:0"><div class="name" id="fileName"></div><div class="meta" id="fileMeta"></div></div>
-            <button id="clear" type="button" data-i18n="change"></button>
+            <button id="clear" type="button" data-i18n="change">Change</button>
           </div>
         </div>
         <div id="pasteMode" class="hidden">
-          <textarea id="cvText" data-i18n-ph="pastePh"></textarea>
+          <textarea id="cvText" data-i18n-ph="pastePh" placeholder="Paste your CV text here..."></textarea>
         </div>
       </div>
       <div>
-        <div class="label"><span data-i18n="jdT"></span><small data-i18n="optional"></small></div>
-        <textarea id="jd" data-i18n-ph="jdPh"></textarea>
-        <div class="hint" data-i18n="jdHint"></div>
+        <div class="label"><span data-i18n="jdT">Job description</span><small data-i18n="optional">optional</small></div>
+        <textarea id="jd" data-i18n-ph="jdPh" placeholder="Paste the job ad here..."></textarea>
+        <div class="hint" data-i18n="jdHint">Add a job ad to also get skill matching and a requirements check.</div>
       </div>
     </div>
     <div class="run-row">
-      <button id="run" class="run" disabled data-i18n="check"></button>
-      <span class="muted" data-i18n="runHint"></span>
+      <button id="run" class="run" disabled data-i18n="check">Check my CV</button>
+      <span class="muted" data-i18n="runHint">Takes a few seconds.</span>
     </div>
     <div id="err" class="err hidden"></div>
   </section>
@@ -288,13 +338,13 @@ footer { text-align: center; color: var(--faint); font-size: 12px; padding: 40px
     </section>
 
     <section class="section fade">
-      <h2 data-i18n="fixesT"></h2>
-      <p class="muted" data-i18n="fixesS"></p>
+      <h2 data-i18n="fixesT">Fixes to make, in order</h2>
+      <p class="muted" data-i18n="fixesS">Starting with the ones that make the biggest difference.</p>
       <div class="card"><div id="fixes"></div><div id="passed"></div></div>
     </section>
 
     <section class="section fade">
-      <h2 data-i18n="bulletsT"></h2>
+      <h2 data-i18n="bulletsT">Bullets to strengthen</h2>
       <p class="muted" id="bulletsSub"></p>
       <div class="card" id="bullets"></div>
     </section>
@@ -302,11 +352,11 @@ footer { text-align: center; color: var(--faint); font-size: 12px; padding: 40px
     <section class="section fade">
       <div class="two">
         <div class="card">
-          <h3 data-i18n="skillsT"></h3>
+          <h3 data-i18n="skillsT">Skills from the advert</h3>
           <div id="skills"></div>
         </div>
         <div class="card">
-          <h3 data-i18n="reqT"></h3>
+          <h3 data-i18n="reqT">Requirements from the advert</h3>
           <div id="reqs"></div>
         </div>
       </div>
@@ -314,12 +364,12 @@ footer { text-align: center; color: var(--faint); font-size: 12px; padding: 40px
 
     <section class="section fade">
       <div class="card report">
-        <div><h3 data-i18n="reportT"></h3><p class="muted" data-i18n="reportS"></p></div>
-        <button class="btn-ghost" id="print" data-i18n="reportBtn"></button>
+        <div><h3 data-i18n="reportT">Your report</h3><p class="muted" data-i18n="reportS">Save the results as a PDF to compare later.</p></div>
+        <button class="btn-ghost" id="print" data-i18n="reportBtn">Save as PDF</button>
       </div>
       <details class="card raw" style="margin-top:16px">
-        <summary data-i18n="rawT"></summary>
-        <p class="muted" style="margin-top:10px" data-i18n="rawS"></p>
+        <summary data-i18n="rawT">What the ATS sees</summary>
+        <p class="muted" style="margin-top:10px" data-i18n="rawS">This is the text an ATS extracts from your file. If the order is jumbled or details are missing, simplify the layout.</p>
         <pre id="rawText"></pre>
       </details>
     </section>
@@ -328,30 +378,30 @@ footer { text-align: center; color: var(--faint); font-size: 12px; padding: 40px
   <!-- Bilgi -->
   <section class="section info-sec">
     <div class="info">
-      <div><h2 data-i18n="infoT"></h2><p class="muted" data-i18n="infoS"></p></div>
+      <div><h2 data-i18n="infoT">What decides whether a recruiter finds your CV</h2><p class="muted" data-i18n="infoS">Most companies screen applications with an ATS. Recruiters search and rank candidates by keyword. These four things decide whether your CV shows up.</p></div>
       <div class="factors">
-        <div class="card factor"><b>1</b><strong data-i18n="f1T"></strong><p data-i18n="f1"></p></div>
-        <div class="card factor"><b>2</b><strong data-i18n="f2T"></strong><p data-i18n="f2"></p></div>
-        <div class="card factor"><b>3</b><strong data-i18n="f3T"></strong><p data-i18n="f3"></p></div>
-        <div class="card factor"><b>4</b><strong data-i18n="f4T"></strong><p data-i18n="f4"></p></div>
+        <div class="card factor"><b>1</b><strong data-i18n="f1T">The file has to be readable</strong><p data-i18n="f1">Scanned images, tables and multi-column designs cause text to get jumbled or lost.</p></div>
+        <div class="card factor"><b>2</b><strong data-i18n="f2T">The CV uses the advert's language</strong><p data-i18n="f2">Recruiters search using the terms in the ad. Describe the same skills with the same words.</p></div>
+        <div class="card factor"><b>3</b><strong data-i18n="f3T">The structure is standard</strong><p data-i18n="f3">Familiar headings like "Experience", "Education" and "Skills" help the ATS put your details in the right fields.</p></div>
+        <div class="card factor"><b>4</b><strong data-i18n="f4T">Achievements are measurable</strong><p data-i18n="f4">After the ATS, a human reads your CV. Results backed by numbers stand out.</p></div>
       </div>
     </div>
   </section>
 
   <section class="section faq-sec">
     <div class="faq-wrap">
-      <div><h2 data-i18n="faqT"></h2></div>
+      <div><h2 data-i18n="faqT">Questions about the CV checker</h2></div>
       <div class="card faq">
-        <details><summary data-i18n="q1"></summary><p data-i18n="a1"></p></details>
-        <details><summary data-i18n="q2"></summary><p data-i18n="a2"></p></details>
-        <details><summary data-i18n="q3"></summary><p data-i18n="a3"></p></details>
-        <details><summary data-i18n="q4"></summary><p data-i18n="a4"></p></details>
-        <details><summary data-i18n="q5"></summary><p data-i18n="a5"></p></details>
+        <details><summary data-i18n="q1">Is the CV checker free?</summary><p data-i18n="a1">Yes. No sign-up or payment needed.</p></details>
+        <details><summary data-i18n="q2">Is my CV uploaded to a server?</summary><p data-i18n="a2">No. Your file is processed entirely in your browser and is never sent anywhere.</p></details>
+        <details><summary data-i18n="q3">What is an ATS?</summary><p data-i18n="a3">An Applicant Tracking System is software companies use to collect applications, extract information from CVs and search for candidates. Workday, Greenhouse and Lever are common examples.</p></details>
+        <details><summary data-i18n="q4">How is the score calculated?</summary><p data-i18n="a4">Checks such as readability, layout, sections and contact details are scored by weight. Bullets are scored proportionally: if half your bullets have no number, you get half the points for that check. If you add a job ad, keyword match makes up 30% of the score. Scores differ between tools because each uses its own criteria.</p></details>
+        <details><summary data-i18n="q5">Should I send a PDF or a Word file?</summary><p data-i18n="a5">Both work in most ATS. What matters is that the PDF contains real text (not a scan) and uses a simple single-column layout.</p></details>
       </div>
     </div>
   </section>
 </div>
-<footer data-i18n="footer"></footer>
+<footer data-i18n="footer">Results are guidance only; every ATS works differently.</footer>
 
 <script>
 /* =========================================================
@@ -360,6 +410,8 @@ footer { text-align: center; color: var(--faint); font-size: 12px; padding: 40px
 const I18N = {
   tr: {
     brand: "ATS Kontrol",
+    metaTitle: "Ücretsiz ATS CV Kontrolü ve Özgeçmiş Tarayıcı | CV'nizi Online Kontrol Edin",
+    metaDesc: "Ücretsiz ATS CV kontrol aracı. CV'nizi yükleyin; ATS puanı, öncelikli düzeltme listesi, güçlendirilecek maddeler ve iş ilanıyla anahtar kelime eşleşmesi alın. Dosyanız tarayıcınızdan çıkmaz.",
     privacy: "Dosyanız cihazınızdan çıkmaz",
     eyebrow: "Ücretsiz · Kayıt gerektirmez",
     h1a: "ATS CV kontrolü", h1b: "ve özgeçmiş tarayıcı",
@@ -496,6 +548,8 @@ const I18N = {
 
   en: {
     brand: "ATS Checker",
+    metaTitle: "Free ATS CV Checker & Resume Scanner | Check Your CV Online",
+    metaDesc: "Free ATS CV checker and resume scanner. Upload your CV to get an ATS score, a prioritised list of fixes, weak bullets to rewrite and keyword matching against the job ad. Runs in your browser; your file is never uploaded.",
     privacy: "Your file never leaves your device",
     eyebrow: "Free · No sign-up",
     h1a: "ATS CV checker", h1b: "and resume scanner",
@@ -633,12 +687,20 @@ const I18N = {
 
 let LANG = "en"; // Varsayılan dil İngilizce; kullanıcı TR seçerse tercihi hatırlanır
 try { LANG = localStorage.getItem("ats-lang") || "en"; } catch (e) {}
+// ?lang=tr / ?lang=en bağlantısı kayıtlı tercihten önce gelir (arama motorları ve paylaşılan linkler için)
+const urlLang = new URLSearchParams(location.search).get("lang");
+if (urlLang === "tr" || urlLang === "en") LANG = urlLang;
 if (!I18N[LANG]) LANG = "en";
 const T = () => I18N[LANG];
 
 function applyI18n() {
   document.documentElement.lang = LANG;
-  document.title = LANG === "tr" ? "ATS CV Kontrol" : "ATS CV Checker";
+  document.title = T().metaTitle;
+  document.querySelector('meta[name="description"]').content = T().metaDesc;
+  const base = "https://burcuxx.github.io/ats-checker/";
+  document.querySelector('link[rel="canonical"]').href = LANG === "tr" ? base + "?lang=tr" : base;
+  // Paylaşılan link seçilen dili korusun
+  try { const u = new URL(location.href); if (LANG === "tr") u.searchParams.set("lang", "tr"); else u.searchParams.delete("lang"); history.replaceState(null, "", u); } catch (e) {}
   document.querySelectorAll("[data-i18n]").forEach((el) => { const v = T()[el.dataset.i18n]; if (typeof v === "string") el.textContent = v; });
   document.querySelectorAll("[data-i18n-ph]").forEach((el) => { el.placeholder = T()[el.dataset.i18nPh]; });
   [...$("lang").children].forEach((b) => b.classList.toggle("on", b.dataset.l === LANG));
@@ -648,7 +710,26 @@ function applyI18n() {
 /* =========================================================
    Arayüz
    ========================================================= */
-if (window.pdfjsLib) pdfjsLib.GlobalWorkerOptions.workerSrc = "https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js";
+/* PDF ve DOCX okuyucular büyük (~1 MB); sayfa hızlı açılsın diye yalnızca gerektiğinde indirilir */
+const LIBS = {
+  pdf: "https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js",
+  docx: "https://cdnjs.cloudflare.com/ajax/libs/mammoth/1.6.0/mammoth.browser.min.js",
+};
+const libLoads = {};
+function loadLib(kind) {
+  if (kind === "pdf" && window.pdfjsLib) return Promise.resolve();
+  if (kind === "docx" && window.mammoth) return Promise.resolve();
+  return (libLoads[kind] = libLoads[kind] || new Promise((res, rej) => {
+    const sc = document.createElement("script");
+    sc.src = LIBS[kind];
+    sc.onload = () => {
+      if (kind === "pdf") pdfjsLib.GlobalWorkerOptions.workerSrc = "https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js";
+      res();
+    };
+    sc.onerror = () => { delete libLoads[kind]; rej(new Error(kind === "pdf" ? T().errPdfLib : T().errDocxLib)); };
+    document.head.appendChild(sc);
+  }));
+}
 const $ = (id) => document.getElementById(id);
 let currentFile = null, mode = "file", lastResult = null;
 
@@ -680,6 +761,8 @@ $("print").addEventListener("click", () => window.print());
 
 function setFile(f) {
   if (!f) return;
+  const ext = f.name.split(".").pop().toLowerCase();
+  if (ext === "pdf" || ext === "docx") loadLib(ext).catch(() => {}); // analizden önce arka planda indir
   currentFile = f;
   $("fileName").textContent = f.name;
   $("fileMeta").textContent = (f.size / 1024).toFixed(0) + " KB";
@@ -717,8 +800,8 @@ async function extract(file) {
   const ext = file.name.split(".").pop().toLowerCase();
   const buf = await file.arrayBuffer();
   const base = { name: file.name, size: file.size, ext };
-  if (ext === "pdf") { if (!window.pdfjsLib) throw new Error(T().errPdfLib); return { ...base, ...(await extractPdf(buf)) }; }
-  if (ext === "docx") { if (!window.mammoth) throw new Error(T().errDocxLib); return { ...base, ...(await extractDocx(buf)) }; }
+  if (ext === "pdf") { await loadLib("pdf"); return { ...base, ...(await extractPdf(buf)) }; }
+  if (ext === "docx") { await loadLib("docx"); return { ...base, ...(await extractDocx(buf)) }; }
   if (ext === "txt") return { ...base, text: new TextDecoder().decode(buf), pages: null };
   throw new Error(T().errType);
 }

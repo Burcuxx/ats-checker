@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://burcuxx.github.io/ats-checker/sitemap.xml
