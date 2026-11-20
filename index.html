@@ -74,6 +74,7 @@
   --border: #e4e7f1; --accent: #4f46e5; --accent-2: #7c3aed; --accent-soft: #eef0ff;
   --ok: #15803d; --ok-soft: #e8f7ee; --warn: #a1500a; --warn-soft: #fdf3e2; --bad: #b91c1c; --bad-soft: #fdecec;
   --shadow: 0 1px 2px rgba(20,24,50,.04), 0 8px 24px rgba(20,24,50,.06); --radius: 16px;
+  --topbar-shadow: 0 6px 20px rgba(20,24,50,.06);
   color-scheme: light;
 }
 /* Tema: "Sistem" seçiliyse işletim sistemini izler; "Açık"/"Koyu" seçildiyse <html data-theme> zorlar */
@@ -83,6 +84,7 @@
     --border: #262b45; --accent: #818cf8; --accent-2: #a78bfa; --accent-soft: #1e2246;
     --ok: #4ade80; --ok-soft: #12291d; --warn: #fbbf24; --warn-soft: #2d2412; --bad: #f87171; --bad-soft: #301617;
     --shadow: 0 1px 2px rgba(0,0,0,.3), 0 8px 24px rgba(0,0,0,.25);
+    --topbar-shadow: 0 6px 20px rgba(0,0,0,.35);
     color-scheme: dark;
   }
 }
@@ -91,6 +93,7 @@
     --border: #262b45; --accent: #818cf8; --accent-2: #a78bfa; --accent-soft: #1e2246;
     --ok: #4ade80; --ok-soft: #12291d; --warn: #fbbf24; --warn-soft: #2d2412; --bad: #f87171; --bad-soft: #301617;
     --shadow: 0 1px 2px rgba(0,0,0,.3), 0 8px 24px rgba(0,0,0,.25);
+    --topbar-shadow: 0 6px 20px rgba(0,0,0,.35);
   color-scheme: dark;
 }
 * { box-sizing: border-box; }
@@ -111,8 +114,18 @@ body {
 /* Nav */
 /* Sticky üst çubuk: tam genişlik, yarı saydam ve bulanık; kaydırınca alt çizgi belirir */
 /* En üstte tamamen saydam (sayfanın arka planıyla bütünleşik); kaydırınca buzlu cam arka plan gelir */
-.topbar { position: sticky; top: 0; z-index: 30; background: transparent; border-bottom: 1px solid transparent; transition: background-color .3s, border-color .3s, box-shadow .3s, -webkit-backdrop-filter .3s, backdrop-filter .3s; }
-.topbar.scrolled { background: color-mix(in srgb, var(--bg) 80%, transparent); -webkit-backdrop-filter: saturate(1.4) blur(14px); backdrop-filter: saturate(1.4) blur(14px); border-bottom-color: var(--border); box-shadow: 0 6px 20px rgba(10,14,40,.06); }
+/* Blur animasyona katılmaz (Safari'de takılmasın); yalnızca renk, çizgi ve gölge yumuşakça gelir */
+.topbar { position: sticky; top: 0; z-index: 30; background: transparent; border-bottom: 1px solid transparent; transition: background-color .3s var(--ease, ease), border-color .3s, box-shadow .3s; }
+.topbar.scrolled {
+  background: var(--bg); /* color-mix desteklemeyen eski tarayıcılar için opak yedek */
+  background: color-mix(in srgb, var(--bg) 85%, transparent);
+  -webkit-backdrop-filter: saturate(1.15) blur(12px); backdrop-filter: saturate(1.15) blur(12px);
+  border-bottom-color: var(--border); box-shadow: var(--topbar-shadow);
+}
+/* Bulanıklık yoksa alttaki içerik net görünmesin diye neredeyse opak zemin */
+@supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
+  .topbar.scrolled { background: color-mix(in srgb, var(--bg) 96%, transparent); }
+}
 
 /* Kaydırma çubuğu: ince, yuvarlak, tema renklerinde */
 :root { --scroll-thumb: color-mix(in srgb, var(--muted) 45%, transparent); --scroll-thumb-hover: color-mix(in srgb, var(--accent) 75%, transparent); }
@@ -147,7 +160,7 @@ textarea, pre { scrollbar-width: thin; scrollbar-color: var(--scroll-thumb) tran
 /* Hero */
 .hero { display: grid; gap: 20px; padding: 24px 0 28px; align-items: center; }
 @media (min-width: 860px) { .hero { grid-template-columns: 1.3fr 1fr; } }
-.eyebrow { display: inline-block; font-size: 12px; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; color: var(--accent); margin-bottom: 10px; }
+.eyebrow { text-wrap: balance; display: inline-block; font-size: 12px; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; color: var(--accent); margin-bottom: 10px; }
 .hero h1 { margin: 0 0 12px; font-size: clamp(30px, 4.8vw, 46px); line-height: 1.08; letter-spacing: -.03em; font-weight: 800; }
 .hero h1 span { background: linear-gradient(90deg, var(--accent), var(--accent-2)); -webkit-background-clip: text; background-clip: text; color: transparent; }
 .hero p { margin: 0; color: var(--muted); font-size: 16px; }
@@ -336,7 +349,7 @@ details.raw[open] summary::after, .faq details[open] summary::after { content: "
 }
 
 /* Aşağı kaydırınca belirme (JS eklerse) */
-.reveal { opacity: 0; transform: translateY(16px); transition: opacity .6s var(--ease), transform .6s var(--ease); }
+.reveal { opacity: 0; transform: translateY(10px); transition: opacity .45s var(--ease), transform .45s var(--ease); }
 .reveal.in { opacity: 1; transform: none; }
 
 /* Dil değişince içerik hafifçe yenilenir */
@@ -394,7 +407,7 @@ details.raw[open] summary::after, .faq details[open] summary::after { content: "
 
   <header class="hero">
     <div>
-      <span class="eyebrow" data-i18n="eyebrow">Free · No sign-up</span>
+      <span class="eyebrow" data-i18n="eyebrow">Free · No sign-up · Your file never leaves your device</span>
       <h1><span data-i18n="h1a">ATS CV checker</span> <span data-i18n="h1b">and resume scanner</span></h1>
       <p data-i18n="heroP">Check your CV before you apply. See what hiring software reads, what it misses, and how well you match the job ad.</p>
     </div>
@@ -543,7 +556,7 @@ const I18N = {
     metaTitle: "Ücretsiz ATS CV Kontrolü ve Özgeçmiş Tarayıcı | CV'nizi Online Kontrol Edin",
     metaDesc: "Ücretsiz ATS CV kontrol aracı. CV'nizi yükleyin; ATS puanı, öncelikli düzeltme listesi, güçlendirilecek maddeler ve iş ilanıyla anahtar kelime eşleşmesi alın. Dosyanız tarayıcınızdan çıkmaz.",
     privacy: "Dosyanız cihazınızdan çıkmaz",
-    eyebrow: "Ücretsiz · Kayıt gerektirmez",
+    eyebrow: "Ücretsiz · Kayıt gerektirmez · Dosyanız cihazınızdan çıkmaz",
     h1a: "ATS CV kontrolü", h1b: "ve özgeçmiş tarayıcı",
     heroP: "CV'nizi başvurmadan önce kontrol edin. İşe alım yazılımlarının neyi okuyup neyi kaçırdığını ve iş ilanıyla ne kadar eşleştiğinizi görün.",
     heroBoxT: "Neler alırsınız?",
@@ -682,7 +695,7 @@ const I18N = {
     metaTitle: "Free ATS CV Checker & Resume Scanner | Check Your CV Online",
     metaDesc: "Free ATS CV checker and resume scanner. Upload your CV to get an ATS score, a prioritised list of fixes, weak bullets to rewrite and keyword matching against the job ad. Runs in your browser; your file is never uploaded.",
     privacy: "Your file never leaves your device",
-    eyebrow: "Free · No sign-up",
+    eyebrow: "Free · No sign-up · Your file never leaves your device",
     h1a: "ATS CV checker", h1b: "and resume scanner",
     heroP: "Check your CV before you apply. See what hiring software reads, what it misses, and how well you match the job ad.",
     heroBoxT: "What you get",
@@ -977,7 +990,7 @@ window.addEventListener("resize", moveAllInd);
     if (!en.isIntersecting) return;
     en.target.querySelectorAll(".reveal").forEach((el) => el.classList.add("in"));
     io.unobserve(en.target);
-  }), { threshold: 0, rootMargin: "0px 0px -15% 0px" });
+  }), { threshold: 0, rootMargin: "0px 0px 120px 0px" }); // ekrana girmeden 120 px önce belirmeye başlar
   groups.forEach((g) => {
     const items = g.querySelectorAll(":scope > div:first-child, .factor, .faq");
     items.forEach((el, i) => { el.classList.add("reveal"); el.style.transitionDelay = i * 40 + "ms"; });
