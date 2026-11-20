@@ -980,9 +980,16 @@ function extractBullets(sections) {
   }
   if (marked.length) return marked.map((b) => b.replace(/\s*(https?:\/\/\S+|www\.\S+|\S*linkedin\.com\/\S*)/gi, "").trim())
     .filter((b) => b.split(/\s+/).length >= 3).slice(0, 30);
-  // İşaret yoksa: deneyim bölümündeki uzun cümleler
-  return (sections.experience || [])
-    .filter((l) => l.split(/\s+/).length >= 8 && !/(19|20)\d{2}\s*[–—-]/.test(l))
+  // İşaret yoksa: deneyim bölümündeki cümleler. PDF'te iki satıra kaydırılmış bir cümle tek madde olarak birleştirilir:
+  // önceki satır noktayla bitmiyorsa ve yeni satır küçük harfle başlıyorsa devamıdır.
+  const joined = [];
+  for (const line of sections.experience || []) {
+    const prev = joined[joined.length - 1];
+    if (prev && !/[.!?;:]$/.test(prev) && /^[a-zçğıöşü(&]/.test(line)) joined[joined.length - 1] = prev + " " + line;
+    else joined.push(line);
+  }
+  return joined
+    .filter((l) => l.split(/\s+/).length >= 8 && !/(19|20)\d{2}\s*[–—-]/.test(l) && !/\|\s*\w+\s+(19|20)\d{2}/.test(l))
     .slice(0, 30);
 }
 
