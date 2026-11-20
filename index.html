@@ -2,6 +2,9 @@
 <html lang="en">
 <head>
 <meta charset="utf-8" />
+<!-- Gizlilik güvencesi: sayfa cdnjs dışında hiçbir sunucuya bağlanamaz, form gönderemez, veri yükleyemez.
+     (connect-src yalnızca sitenin kendisine ve imzalı kütüphaneler için cdnjs'e izin verir; GitHub Pages statik bir sunucudur, veri kabul etmez.) -->
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'unsafe-inline' https://cdnjs.cloudflare.com; style-src 'unsafe-inline'; img-src 'self' data: blob:; connect-src 'self' https://cdnjs.cloudflare.com; worker-src blob:; base-uri 'none'; form-action 'none'; object-src 'none'" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>Free ATS CV Checker &amp; Resume Scanner | Check Your CV Online</title>
 <meta name="description" content="Free ATS CV checker and resume scanner. Upload your CV to get an ATS score, a prioritised list of fixes, weak bullets to rewrite and keyword matching against the job ad. Runs in your browser; your file is never uploaded." />
@@ -30,7 +33,7 @@
 <meta name="twitter:description" content="ATS score, prioritised fixes and job-ad keyword matching. Free and private." />
 <meta name="twitter:image" content="https://burcuxx.github.io/ats-checker/og-image.png" />
 <!-- PDF/DOCX okuyucular CV yüklenince indirilir; sayfa açılışını yavaşlatmasın diye yalnızca bağlantı önceden hazırlanır -->
-<link rel="preconnect" href="https://cdnjs.cloudflare.com" />
+<link rel="preconnect" href="https://cdnjs.cloudflare.com" crossorigin />
 <script type="application/ld+json">
 {
   "@context": "https://schema.org",
@@ -148,6 +151,7 @@ textarea, pre { scrollbar-width: thin; scrollbar-color: var(--scroll-thumb) tran
 .hero h1 { margin: 0 0 12px; font-size: clamp(30px, 4.8vw, 46px); line-height: 1.08; letter-spacing: -.03em; font-weight: 800; }
 .hero h1 span { background: linear-gradient(90deg, var(--accent), var(--accent-2)); -webkit-background-clip: text; background-clip: text; color: transparent; }
 .hero p { margin: 0; color: var(--muted); font-size: 16px; }
+.hero-box { display: flex; flex-direction: column; justify-content: center; }
 .hero-box h2 { margin: 0 0 10px; font-size: 14px; }
 .ticks { list-style: none; margin: 0; padding: 0; display: grid; gap: 8px; }
 .ticks li { display: flex; gap: 10px; font-size: 14px; color: var(--muted); }
@@ -397,7 +401,7 @@ details.raw[open] summary::after, .faq details[open] summary::after { content: "
     <div class="card hero-box">
       <h2 data-i18n="heroBoxT">What you get</h2>
       <ul class="ticks">
-        <li data-i18n="tick1">An ATS score with sub-scores</li><li data-i18n="tick2">A list of fixes, in order of impact</li><li data-i18n="tick3">CV bullets that need strengthening</li><li data-i18n="tick4">A comparison with the skills and requirements in the ad</li>
+        <li data-i18n="tick1">An ATS score with sub-scores</li><li data-i18n="tick2">A list of fixes, in order of impact</li><li data-i18n="tick3">CV bullets that need strengthening</li><li data-i18n="tick4">Skills and requirements matched to the ad</li>
       </ul>
     </div>
   </header>
@@ -555,8 +559,8 @@ const I18N = {
     jdHint: "İlan eklerseniz beceri eşleşmesi ve gereksinim karşılaştırması da yapılır.",
     check: "CV'mi kontrol et", checking: "Analiz ediliyor", runHint: "Birkaç saniye sürer.",
     errRead: "Dosya okunamadı: ",
-    errPdfLib: "PDF okuyucu yüklenemedi, internet bağlantınızı kontrol edin.",
-    errDocxLib: "DOCX okuyucu yüklenemedi, internet bağlantınızı kontrol edin.",
+    errPdfLib: "PDF okuyucu yüklenemedi ya da güvenlik doğrulamasından geçmedi. İnternet bağlantınızı kontrol edip tekrar deneyin.",
+    errDocxLib: "DOCX okuyucu yüklenemedi ya da güvenlik doğrulamasından geçmedi. İnternet bağlantınızı kontrol edip tekrar deneyin.",
     errType: "Desteklenmeyen dosya türü (.doc yerine .docx kullanın).",
     resTitleJd: "Bu ilana göre CV'niz", resTitle: "CV'nizin ATS sonucu",
     resSubJd: "ATS uyumu ve ilanla eşleşme birlikte değerlendirildi.",
@@ -685,7 +689,7 @@ const I18N = {
     tick1: "An ATS score with sub-scores",
     tick2: "A list of fixes, in order of impact",
     tick3: "CV bullets that need strengthening",
-    tick4: "A comparison with the skills and requirements in the ad",
+    tick4: "Skills and requirements matched to the ad",
     yourCv: "Your CV", upload: "Upload file", paste: "Paste text",
     dropT: "Drag a file here or browse", dropS: "PDF, DOCX or TXT", change: "Change",
     pastePh: "Paste your CV text here...",
@@ -694,8 +698,8 @@ const I18N = {
     jdHint: "Add a job ad to also get skill matching and a requirements check.",
     check: "Check my CV", checking: "Analysing", runHint: "Takes a few seconds.",
     errRead: "Could not read the file: ",
-    errPdfLib: "The PDF reader failed to load. Check your internet connection.",
-    errDocxLib: "The DOCX reader failed to load. Check your internet connection.",
+    errPdfLib: "The PDF reader failed to load or didn't pass its security check. Check your connection and try again.",
+    errDocxLib: "The DOCX reader failed to load or didn't pass its security check. Check your connection and try again.",
     errType: "Unsupported file type (use .docx instead of .doc).",
     resTitleJd: "Your CV against this job", resTitle: "Your CV's ATS result",
     resSubJd: "ATS compatibility and job match combined.",
@@ -820,6 +824,39 @@ if (urlLang === "tr" || urlLang === "en") LANG = urlLang;
 if (!I18N[LANG]) LANG = "en";
 const T = () => I18N[LANG];
 
+/* Sabit metinleri verilen dile çevir (yalnızca metin; başka yan etki yok) */
+function setStaticTexts(lang) {
+  const d = I18N[lang];
+  document.querySelectorAll("[data-i18n]").forEach((el) => { const v = d[el.dataset.i18n]; if (typeof v === "string") el.textContent = v; });
+}
+
+/* Dil değişince sayfa zıplamasın: her metin bloğunun iki dildeki yüksekliğini ölç, büyük olanı min-height yap.
+   Sonuç alanı (dinamik) ve kapalı Tercihler paneli hariç. Pencere boyutu değişince yeniden ölçülür. */
+let i18nBlocks = null;
+function lockTextHeights() {
+  if (!i18nBlocks) {
+    const set = new Set();
+    document.querySelectorAll("[data-i18n]").forEach((el) => {
+      if (el.closest("#results, .prefs, .nav")) return;
+      // Kart içindeki satırlar tek tek değil, kartın tamamı sabitlenir (içerik ortalandığı için boşluk dengeli kalır)
+      const card = el.closest(".hero-box");
+      const block = card || (getComputedStyle(el).display.startsWith("inline") ? el.parentElement : el);
+      set.add(block);
+    });
+    i18nBlocks = [...set];
+  }
+  i18nBlocks.forEach((b) => (b.style.minHeight = ""));
+  const max = new Map();
+  for (const lang of Object.keys(I18N)) {
+    setStaticTexts(lang);
+    i18nBlocks.forEach((b) => max.set(b, Math.max(max.get(b) || 0, b.getBoundingClientRect().height)));
+  }
+  setStaticTexts(LANG);
+  i18nBlocks.forEach((b) => { const h = max.get(b); if (h) b.style.minHeight = Math.ceil(h) + "px"; });
+}
+let lockTimer;
+addEventListener("resize", () => { clearTimeout(lockTimer); lockTimer = setTimeout(lockTextHeights, 150); });
+
 function applyI18n() {
   document.documentElement.lang = LANG;
   document.title = T().metaTitle;
@@ -828,7 +865,7 @@ function applyI18n() {
   document.querySelector('link[rel="canonical"]').href = LANG === "tr" ? base + "?lang=tr" : base;
   // Paylaşılan link seçilen dili korusun
   try { const u = new URL(location.href); if (LANG === "tr") u.searchParams.set("lang", "tr"); else u.searchParams.delete("lang"); history.replaceState(null, "", u); } catch (e) {}
-  document.querySelectorAll("[data-i18n]").forEach((el) => { const v = T()[el.dataset.i18n]; if (typeof v === "string") el.textContent = v; });
+  setStaticTexts(LANG);
   document.querySelectorAll("[data-i18n-ph]").forEach((el) => { el.placeholder = T()[el.dataset.i18nPh]; });
   [...$("lang").children].forEach((b) => b.classList.toggle("on", b.dataset.l === LANG));
   document.querySelectorAll("[data-i18n-aria]").forEach((el) => el.setAttribute("aria-label", T()[el.dataset.i18nAria]));
@@ -845,6 +882,13 @@ const LIBS = {
   pdf: "https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js",
   docx: "https://cdnjs.cloudflare.com/ajax/libs/mammoth/1.6.0/mammoth.browser.min.js",
 };
+// cdnjs'in yayınladığı resmi SHA-512 imzaları: dosya bir bayt bile değişirse tarayıcı çalıştırmaz
+const SRI = {
+  pdf: "sha512-q+4liFwdPC/bNdhUpZx6aXDx/h77yEQtn4I1slHydcbZK34nLaR3cAeYSJshoxIOq3mjEf7xJE8YWIUHMn+oCQ==",
+  docx: "sha512-sG5Q7boJL+ft/weuz6Mmi9XBD+bEzE9AI2FMP4YMFxp3FpTFUQSQQm5K5cSgJCyed6bWs3W8f8h0lp36lHXhQA==",
+  worker: "sha512-BbrZ76UNZq5BhH7LL7pn9A4TKQpQeNCHOo65/akfelcIBbcVvYWOFQKPXIrykE3qZxYjmDX573oa4Ywsc7rpTw==",
+};
+const WORKER_URL = "https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js";
 const libLoads = {};
 function loadLib(kind) {
   if (kind === "pdf" && window.pdfjsLib) return Promise.resolve();
@@ -852,9 +896,16 @@ function loadLib(kind) {
   return (libLoads[kind] = libLoads[kind] || new Promise((res, rej) => {
     const sc = document.createElement("script");
     sc.src = LIBS[kind];
-    sc.onload = () => {
-      if (kind === "pdf") pdfjsLib.GlobalWorkerOptions.workerSrc = "https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js";
-      res();
+    sc.integrity = SRI[kind];
+    sc.crossOrigin = "anonymous";
+    sc.onload = async () => {
+      if (kind !== "pdf") return res();
+      try {
+        // Worker <script> ile yüklenmediği için imza fetch ile doğrulanır, sonra yerel bir blob olarak çalıştırılır
+        const code = await (await fetch(WORKER_URL, { integrity: SRI.worker, mode: "cors" })).text();
+        pdfjsLib.GlobalWorkerOptions.workerSrc = URL.createObjectURL(new Blob([code], { type: "text/javascript" }));
+        res();
+      } catch (e) { delete libLoads[kind]; rej(new Error(T().errPdfLib)); }
     };
     sc.onerror = () => { delete libLoads[kind]; rej(new Error(kind === "pdf" ? T().errPdfLib : T().errDocxLib)); };
     document.head.appendChild(sc);
@@ -1005,7 +1056,7 @@ async function extract(file) {
 }
 
 async function extractPdf(buf) {
-  const pdf = await pdfjsLib.getDocument({ data: buf }).promise;
+  const pdf = await pdfjsLib.getDocument({ data: buf, isEvalSupported: false }).promise;
   let text = "", images = 0, multiColLines = 0, totalLines = 0, pageCols = 0;
   const OPS = pdfjsLib.OPS;
   for (let p = 1; p <= pdf.numPages; p++) {
@@ -1686,6 +1737,7 @@ function esc(s) { return String(s).replace(/[&<>"]/g, (c) => ({ "&": "&amp;", "<
 
 applyI18n();
 applyTheme();
+lockTextHeights();
 </script>
 </body>
 </html>
