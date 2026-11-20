@@ -246,6 +246,67 @@ pre { white-space: pre-wrap; word-break: break-word; max-height: 420px; overflow
 @keyframes f { from { opacity: 0; transform: translateY(8px); } }
 footer { text-align: center; color: var(--faint); font-size: 12px; padding: 40px 0 32px; }
 
+/* =========================================================
+   Hareket: geçişler ve basit animasyonlar (yalnızca transform/opacity → kayma yok, hızlı)
+   ========================================================= */
+:root { --ease: cubic-bezier(.2, .8, .2, 1); }
+:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+button, .btn-ghost, .run { transition: transform .15s var(--ease), background-color .2s, color .2s, box-shadow .2s, opacity .2s; }
+button:active:not(:disabled) { transform: scale(.97); }
+.btn-ghost:hover { background: color-mix(in srgb, var(--accent) 18%, var(--card)); }
+
+/* Sekme ve dil seçicide kayan gösterge */
+.seg, .lang { position: relative; isolation: isolate; }
+.seg button, .lang button { position: relative; z-index: 1; }
+.seg button.on, .lang button.on { background: transparent; box-shadow: none; }
+.seg .ind, .lang .ind { position: absolute; top: 3px; bottom: 3px; left: 0; z-index: 0; border-radius: 8px; pointer-events: none; }
+.seg .ind { background: var(--card); box-shadow: var(--shadow); }
+.lang .ind { background: var(--accent); border-radius: 999px; }
+.seg.ready .ind, .lang.ready .ind { transition: transform .3s var(--ease), width .3s var(--ease); }
+
+/* Dosya alanı ↔ metin alanı geçişi, dosya seçildiğinde kart */
+.swap-in { animation: swapIn .3s var(--ease) both; }
+@keyframes swapIn { from { opacity: 0; transform: translateY(6px); } }
+.pop { animation: pop .35s var(--ease) both; }
+@keyframes pop { from { opacity: 0; transform: scale(.96); } }
+.drop .ic { transition: transform .25s var(--ease); }
+.drop:hover .ic, .drop.over .ic { transform: translateY(-3px) scale(1.06); }
+.drop.over { transform: scale(1.01); }
+.drop { transition: border-color .2s, background-color .2s, transform .2s var(--ease); }
+
+/* Sonuçlar: bölümler ve satırlar sırayla belirir */
+.item-in { animation: itemIn .4s var(--ease) both; animation-delay: calc(var(--i, 0) * 35ms); }
+@keyframes itemIn { from { opacity: 0; transform: translateY(6px); } }
+.chip.item-in { animation-name: chipIn; }
+@keyframes chipIn { from { opacity: 0; transform: scale(.9); } }
+
+/* Kartlar */
+.factor { transition: transform .25s var(--ease), box-shadow .25s; }
+.factor:hover { transform: translateY(-3px); box-shadow: 0 1px 2px rgba(20,24,50,.05), 0 14px 30px rgba(20,24,50,.10); }
+
+/* Akordiyonlar: yumuşak açılış (destekleyen tarayıcılarda) ve dönen + işareti */
+details.raw summary::after, .faq summary::after { transition: transform .25s var(--ease); }
+details.raw[open] summary::after, .faq details[open] summary::after { content: "+"; transform: rotate(45deg); }
+@supports (interpolate-size: allow-keywords) {
+  :root { interpolate-size: allow-keywords; }
+  details::details-content { block-size: 0; overflow: hidden; transition: block-size .3s var(--ease), content-visibility .3s allow-discrete; }
+  details[open]::details-content { block-size: auto; }
+}
+
+/* Aşağı kaydırınca belirme (JS eklerse) */
+.reveal { opacity: 0; transform: translateY(16px); transition: opacity .6s var(--ease), transform .6s var(--ease); }
+.reveal.in { opacity: 1; transform: none; }
+
+/* Dil değişince içerik hafifçe yenilenir */
+.lang-swap main, .lang-swap .wrap > :not(.nav) { animation: langSwap .3s ease both; }
+@keyframes langSwap { from { opacity: .35; } }
+
+/* Hareketi azaltmayı seçen kullanıcılar için animasyon yok */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation-duration: .01ms !important; animation-delay: 0ms !important; transition-duration: .01ms !important; scroll-behavior: auto !important; }
+  .reveal { opacity: 1; transform: none; }
+}
+
 @media print {
   body { background: #fff; }
   .nav, .hero, #inputCard, .report, .info-sec, .faq-sec, footer { display: none !important; }
@@ -263,6 +324,7 @@ footer { text-align: center; color: var(--faint); font-size: 12px; padding: 40px
       <div class="lang" id="lang"><button data-l="tr">TR</button><button data-l="en">EN</button></div>
     </div>
   </nav>
+  <main id="main">
 
   <header class="hero">
     <div>
@@ -400,6 +462,7 @@ footer { text-align: center; color: var(--faint); font-size: 12px; padding: 40px
       </div>
     </div>
   </section>
+  </main>
 </div>
 <footer data-i18n="footer">Results are guidance only; every ATS works differently.</footer>
 
@@ -704,6 +767,7 @@ function applyI18n() {
   document.querySelectorAll("[data-i18n]").forEach((el) => { const v = T()[el.dataset.i18n]; if (typeof v === "string") el.textContent = v; });
   document.querySelectorAll("[data-i18n-ph]").forEach((el) => { el.placeholder = T()[el.dataset.i18nPh]; });
   [...$("lang").children].forEach((b) => b.classList.toggle("on", b.dataset.l === LANG));
+  if (typeof moveAllInd === "function") requestAnimationFrame(moveAllInd); // metin genişliği dile göre değişir
   if (lastResult) render(lastResult, false);
 }
 
@@ -734,11 +798,35 @@ const $ = (id) => document.getElementById(id);
 let currentFile = null, mode = "file", lastResult = null;
 
 $("lang").addEventListener("click", (e) => {
-  const b = e.target.closest("button"); if (!b) return;
+  const b = e.target.closest("button"); if (!b || b.dataset.l === LANG) return;
   LANG = b.dataset.l;
   try { localStorage.setItem("ats-lang", LANG); } catch (err) {}
+  document.body.classList.remove("lang-swap"); void document.body.offsetWidth; document.body.classList.add("lang-swap");
   applyI18n();
 });
+
+/* Kayan sekme göstergesi: seçili düğmenin altına yumuşakça kayar */
+function moveInd(box) {
+  let ind = box.querySelector(".ind");
+  if (!ind) { ind = document.createElement("span"); ind.className = "ind"; ind.setAttribute("aria-hidden", "true"); box.prepend(ind); }
+  const on = box.querySelector("button.on");
+  if (!on) return;
+  ind.style.width = on.offsetWidth + "px";
+  ind.style.transform = `translateX(${on.offsetLeft}px)`;
+  if (!box.classList.contains("ready")) requestAnimationFrame(() => box.classList.add("ready"));
+}
+const moveAllInd = () => [$("lang"), $("mode")].forEach(moveInd);
+window.addEventListener("resize", moveAllInd);
+
+/* Aşağıdaki bölümler görünür alana girince belirsin */
+(function reveal() {
+  const els = document.querySelectorAll(".factor, .faq, .info > div:first-child, .faq-wrap > div:first-child");
+  if (!("IntersectionObserver" in window)) return;
+  const io = new IntersectionObserver((entries) => entries.forEach((en) => {
+    if (en.isIntersecting) { en.target.classList.add("in"); io.unobserve(en.target); }
+  }), { threshold: 0.12 });
+  els.forEach((el, i) => { el.classList.add("reveal"); el.style.transitionDelay = (el.classList.contains("factor") ? (i % 4) * 70 : 0) + "ms"; io.observe(el); });
+})();
 
 $("mode").addEventListener("click", (e) => {
   const b = e.target.closest("button"); if (!b) return;
@@ -746,6 +834,9 @@ $("mode").addEventListener("click", (e) => {
   [...$("mode").children].forEach((x) => x.classList.toggle("on", x === b));
   $("fileMode").classList.toggle("hidden", mode !== "file");
   $("pasteMode").classList.toggle("hidden", mode !== "paste");
+  const shown = $(mode === "file" ? "fileMode" : "pasteMode");
+  shown.classList.remove("swap-in"); void shown.offsetWidth; shown.classList.add("swap-in");
+  moveInd($("mode"));
   updateRun();
 });
 $("cvText").addEventListener("input", updateRun);
@@ -768,6 +859,7 @@ function setFile(f) {
   $("fileMeta").textContent = (f.size / 1024).toFixed(0) + " KB";
   drop.classList.add("hidden");
   $("fileBox").classList.remove("hidden");
+  $("fileBox").classList.remove("pop"); void $("fileBox").offsetWidth; $("fileBox").classList.add("pop");
   $("err").classList.add("hidden");
   updateRun();
 }
@@ -1463,7 +1555,13 @@ function render(r, animate) {
   }).join("") + `</div>`;
 
   $("rawText").textContent = r.doc.text.trim() || t.noText;
-  if (animate) $("results").scrollIntoView({ behavior: "smooth" });
+  if (animate) {
+    // Bölümler sırayla, her bölümün satırları da kısa aralıklarla belirir
+    $("results").querySelectorAll(":scope > section").forEach((sec, i) => (sec.style.animationDelay = i * 90 + "ms"));
+    [["#fixes .fix", 0], ["#bullets .bullet", 0], ["#reqs .req", 0], ["#skills .chip", 0], ["#subscores .sub-row", 0]].forEach(([sel]) =>
+      document.querySelectorAll(sel).forEach((el, i) => { el.style.setProperty("--i", Math.min(i, 14)); el.classList.add("item-in"); }));
+    $("results").scrollIntoView({ behavior: "smooth" });
+  }
 }
 
 function countUp(el, to) {
