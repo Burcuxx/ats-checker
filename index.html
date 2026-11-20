@@ -164,7 +164,7 @@ textarea:focus { border-color: var(--accent); box-shadow: 0 0 0 3px var(--accent
 .req strong { display: block; font-size: 14px; }
 .req p { margin: 2px 0 0; font-size: 13px; color: var(--muted); }
 .pill { font-size: 12px; font-weight: 700; padding: 4px 10px; border-radius: 999px; white-space: nowrap; }
-.pill.ok { background: var(--ok-soft); color: var(--ok); } .pill.miss { background: var(--bad-soft); color: var(--bad); } .pill.unknown { background: var(--bg-2); color: var(--muted); }
+.pill.ok { background: var(--ok-soft); color: var(--ok); } .pill.miss { background: var(--bad-soft); color: var(--bad); } .pill.unknown { background: var(--bg-2); color: var(--muted); } .pill.warn { background: var(--warn-soft); color: var(--warn); }
 .no-jd { padding: 18px; border-radius: 12px; background: var(--bg-2); color: var(--muted); font-size: 14px; }
 
 /* Report */
@@ -414,12 +414,18 @@ const I18N = {
     reqT: "İlandaki gereksinimler",
     noJd: "Beceri ve gereksinim karşılaştırması için yukarıya bir iş ilanı yapıştırın.",
     noReq: "İlanda deneyim süresi, eğitim, dil veya ehliyet gibi belirgin bir gereksinim bulunamadı.",
-    pill: { ok: "Karşılıyor", miss: "Eksik", unknown: "Belirsiz" },
+    pill: { ok: "Karşılıyor", miss: "Eksik", unknown: "Belirsiz", warn: "Kontrol edin" },
+    langDiff: "İlan ve CV'niz farklı dillerde; teknik terimler dışındaki eşleşmeler kaçabilir.",
     req: {
       years: { t: (p) => `En az ${p.need} yıl deneyim`, ok: (p) => `CV'nizdeki tarihlere göre yaklaşık ${p.have} yıl deneyim.`, miss: (p) => `CV'nizdeki tarihlere göre yaklaşık ${p.have} yıl deneyim görünüyor.`, unknown: () => "CV'nizden deneyim süresi hesaplanamadı. Tarihleri \"03/2021 – 05/2024\" biçiminde yazın." },
       degree: { t: (p) => ({ 1: "Lisans derecesi", 2: "Yüksek lisans derecesi", 3: "Doktora derecesi" })[p.need], ok: () => "CV'nizde bu seviyede eğitim bulundu.", miss: () => "CV'nizde bu seviyede eğitim bulunamadı." },
       lang: { t: (p) => `${p.name} dil bilgisi`, ok: () => "CV'nizde geçiyor.", miss: () => "CV'nizde bulunamadı. Varsa seviyesiyle birlikte ekleyin (ör. İngilizce – C1)." },
       license: { t: () => "Sürücü belgesi", ok: () => "CV'nizde geçiyor.", miss: () => "CV'nizde bulunamadı. Varsa sınıfıyla ekleyin (ör. B sınıfı ehliyet)." },
+      adLang: { t: (p) => `İlan ${p.adN} yazılmış, CV'niz ${p.cvN}`,
+        fixT: (p) => `İlan ${p.adN}, CV'nizde ${p.adN} yok`,
+        warn: (p) => `${p.adN} bildiğinizi belirtmişsiniz. Yine de şirket ${p.adN} bir CV bekleyebilir; özellikle yerel şirketlerde bu yaygındır.`,
+        miss: (p) => `İlan ${p.adN} yazıldığı için şirket büyük olasılıkla ${p.adN} bilmenizi bekliyor, ama CV'nizde ${p.adN} bulunamadı. Biliyorsanız Diller bölümüne seviyesiyle ekleyin.` },
+      adPart: { t: (p) => `İlanın bir kısmı ${p.adN}`, unknown: (p) => `${p.adN} bilmek avantaj olabilir; biliyorsanız CV'nize ekleyin.` },
     },
     langNames: { english: "İngilizce", german: "Almanca", french: "Fransızca", spanish: "İspanyolca", arabic: "Arapça", russian: "Rusça", italian: "İtalyanca", turkish: "Türkçe",
       swedish: "İsveççe", norwegian: "Norveççe", danish: "Danca", finnish: "Fince", dutch: "Felemenkçe", portuguese: "Portekizce", polish: "Lehçe",
@@ -544,12 +550,18 @@ const I18N = {
     reqT: "Requirements from the advert",
     noJd: "Paste a job ad above to compare skills and requirements.",
     noReq: "No clear requirements (years of experience, degree, language, licence) found in the ad.",
-    pill: { ok: "Met", miss: "Missing", unknown: "Unclear" },
+    pill: { ok: "Met", miss: "Missing", unknown: "Unclear", warn: "Check" },
+    langDiff: "The ad and your CV are in different languages, so non-technical matches may be missed.",
     req: {
       years: { t: (p) => `At least ${p.need} years of experience`, ok: (p) => `About ${p.have} years based on the dates in your CV.`, miss: (p) => `Your CV dates show about ${p.have} years.`, unknown: () => "Couldn't work out your experience from the CV. Write dates like \"03/2021 – 05/2024\"." },
       degree: { t: (p) => ({ 1: "Bachelor's degree", 2: "Master's degree", 3: "PhD" })[p.need], ok: () => "A degree at this level was found in your CV.", miss: () => "No degree at this level was found in your CV." },
       lang: { t: (p) => `${p.name} language skills`, ok: () => "Mentioned in your CV.", miss: () => "Not found in your CV. If you have it, add it with your level (e.g. German – B2)." },
       license: { t: () => "Driving licence", ok: () => "Mentioned in your CV.", miss: () => "Not found in your CV. If you have one, add it." },
+      adLang: { t: (p) => `The ad is in ${p.adN}, your CV is in ${p.cvN}`,
+        fixT: (p) => `Ad is in ${p.adN}, but ${p.adN} isn't in your CV`,
+        warn: (p) => `You list ${p.adN} in your CV. The company may still expect a CV in ${p.adN}, which is common at local employers.`,
+        miss: (p) => `Because the ad is written in ${p.adN}, the company most likely expects you to speak it, but ${p.adN} wasn't found in your CV. If you speak it, add it to your Languages section with your level.` },
+      adPart: { t: (p) => `Part of the ad is in ${p.adN}`, unknown: (p) => `Knowing ${p.adN} may be an advantage; add it to your CV if you speak it.` },
     },
     langNames: { english: "English", german: "German", french: "French", spanish: "Spanish", arabic: "Arabic", russian: "Russian", italian: "Italian", turkish: "Turkish",
       swedish: "Swedish", norwegian: "Norwegian", danish: "Danish", finnish: "Finnish", dutch: "Dutch", portuguese: "Portuguese", polish: "Polish",
@@ -974,7 +986,38 @@ function polishLang(text) {
   return false;
 }
 
-function requirements(jd, cvLower, sections, cvLang) {
+/* Metnin dilini en sık kullanılan bağlaç/edatları sayarak bul (harici kütüphane yok).
+   Dönüş: { lang, second } — lang: baskın dil (LANGS anahtarı), second: metnin belirgin bir kısmı başka dildeyse o dil */
+const FUNC_WORDS = {
+  english: "the and of to in for with you we our is are be will on as an or this that your have",
+  turkish: "ve bir için ile bu olarak da de olan en çok daha gibi ya veya sahip ise",
+  german: "und der die das mit für ist zu von den im auf ein eine wir sie bei als nicht auch",
+  dutch: "en de het van een voor met je is in op te zijn wij we ons onze ook niet bij",
+  swedish: "och att för med som är av en ett på vi du till har inte om det den våra",
+  danish: "og at af for med som er en et på vi du til har ikke om det den vores også",
+  norwegian: "og at av for med som er en et på vi du til har ikke om det den våre også",
+  french: "et le la les de des pour avec vous nous est un une dans sur en du au votre",
+  spanish: "y el la los las de para con que en un una es por del al nuestro tu su",
+  italian: "e il la di per con che un una è in del della nel sono noi tuo alla",
+  portuguese: "e o a os as de para com que em um uma é do da no na nosso você",
+  finnish: "ja on että tai kanssa sinä me meidän olet työ myös kuin joka hän",
+  polish: "i w z na do że jest się nie dla oraz od jak po przez nasz",
+};
+const FUNC_SETS = Object.fromEntries(Object.entries(FUNC_WORDS).map(([k, v]) => [k, new Set(v.split(" ").map(fold))]));
+function detectLanguage(text) {
+  const words = fold(text).split(/[^\p{L}]+/u).filter(Boolean);
+  const counts = Object.fromEntries(Object.keys(FUNC_SETS).map((k) => [k, 0]));
+  for (const w of words) for (const k in FUNC_SETS) if (FUNC_SETS[k].has(w)) counts[k]++;
+  const ranked = Object.entries(counts).sort((a, b) => b[1] - a[1]);
+  const [lang, n1] = ranked[0];
+  if (n1 < 8) return { lang: null, second: null };
+  // İskandinav dilleri birbirine çok benzer: yalnızca belirgin bir fark varsa ikinciyi "ayrı dil" say
+  const nordic = ["swedish", "danish", "norwegian"];
+  const second = ranked.slice(1).find(([k, n]) => n >= 8 && n >= n1 * 0.3 && !(nordic.includes(k) && nordic.includes(lang)));
+  return { lang, second: second ? second[0] : null };
+}
+
+function requirements(jd, cvLower, sections, cvLang, cvText) {
   const j = fold(jd), out = [];
   // Yıl
   const yrs = [...j.matchAll(/(?:en az|minimum|min\.?|at least)?\s*(\d{1,2})\s*\+?\s*(?:-\s*\d+\s*)?(?:yil|sene|years?|yrs)/g)]
@@ -1003,6 +1046,19 @@ function requirements(jd, cvLower, sections, cvLang) {
   // Ehliyet
   const lic = /ehliyet|sürücü belgesi|driving licen|driver'?s licen/;
   if (lic.test(j)) out.push({ id: "license", p: {}, status: lic.test(cvLower) ? "ok" : "miss" });
+  // İlan dili ≠ CV dili: ilan Almanca yazıldıysa şirket büyük olasılıkla Almanca bilmenizi bekler (puanı etkilemez)
+  const ad = detectLanguage(jd), cv = detectLanguage(cvText || "");
+  const cvKnows = (k) => LANGS[k].some((w) => hasTerm(cvLower, w));
+  // Karışık ilan (ör. iş tanımı İngilizce + Felemenkçe şirket tanıtımı) ve dillerden biri CV'nin diliyse: "kısmen" say
+  if (ad.lang && cv.lang && ad.lang !== cv.lang && ad.second === cv.lang) {
+    if (!cvKnows(ad.lang) && !out.some((q) => q.p.key === ad.lang)) out.push({ id: "adPart", p: { ad: ad.lang }, status: "unknown" });
+  } else if (ad.lang && cv.lang && ad.lang !== cv.lang) {
+    const i = out.findIndex((q) => q.id === "lang" && q.p.key === ad.lang); // aynı dil için açık gereksinim satırını birleştir
+    if (i >= 0) out.splice(i, 1);
+    out.unshift({ id: "adLang", p: { ad: ad.lang, cv: cv.lang }, status: cvKnows(ad.lang) ? "warn" : "miss" });
+  } else if (ad.second && cv.lang && ad.second !== cv.lang && !cvKnows(ad.second) && !out.some((q) => q.p.key === ad.second)) {
+    out.push({ id: "adPart", p: { ad: ad.second }, status: "unknown" });
+  }
   return out;
 }
 
@@ -1080,7 +1136,7 @@ function analyze(doc, jdText) {
   let ats = score(checks);
   if (wc < 50) ats = Math.min(ats, 20);
   const kw = jdText.trim() ? matchKeywords(jdText, lt) : null;
-  const reqs = jdText.trim() ? requirements(jdText, lt, sections, cvLang) : null;
+  const reqs = jdText.trim() ? requirements(jdText, lt, sections, cvLang, text) : null;
   const total = kw ? Math.round(ats * 0.7 + kw.pct * 0.3) : ats;
   const subs = {
     format: score(checks.filter((c) => c.cat === "format")),
@@ -1265,7 +1321,8 @@ function render(r, animate) {
   const fixes = r.checks.filter((c) => c.status !== "pass").sort((a, b) => order[a.status] - order[b.status] || lost(b) - lost(a));
   // İlanda istenip CV'de bulunmayan gereksinimler (dil, deneyim yılı, eğitim, ehliyet): kritiklerden hemen sonra
   const reqFixes = (r.reqs || []).filter((q) => q.status === "miss").map((q) => {
-    const d = t.req[q.id], p = { ...q.p, name: q.p.key ? t.langNames[q.p.key] : "" };
+    const d = t.req[q.id], p = { ...q.p, name: q.p.key ? t.langNames[q.p.key] : "", adN: t.langNames[q.p.ad], cvN: t.langNames[q.p.cv] };
+    if (q.id === "adLang") return { status: "warn", tag: t.prio.warn, title: d.fixT(p), detail: d.miss(p) };
     const name = q.id === "lang" ? p.name : d.t(p);
     return { status: "warn", tag: t.prio.warn, title: t.reqMissing(name), detail: q.id === "years" ? d.miss(p) : t.reqMissingD };
   });
@@ -1301,6 +1358,7 @@ function render(r, animate) {
       <div class="chips">${r.kw.found.map((k) => `<span class="chip hit">${esc(k)}</span>`).join("") || `<span class="muted">${t.noFound}</span>`}</div>
       ${r.kw.other && r.kw.other.length ? `<div class="kw-label">${t.otherT}</div><p class="muted" style="font-size:13px;margin-bottom:8px">${t.otherS}</p>
       <div class="chips">${r.kw.other.map((o) => `<span class="chip other${o.inCv ? " in" : ""}">${esc(o.name)}${o.inCv ? " ✓" : ""}</span>`).join("")}</div>` : ""}`;
+    if ((r.reqs || []).some((q) => q.id === "adLang")) $("skills").insertAdjacentHTML("afterbegin", `<div class="pill warn" style="display:block;white-space:normal;margin:8px 0 4px;font-weight:600">${t.langDiff}</div>`);
     const kwBar = $("skills").querySelector(".meter i");
     animate ? setTimeout(() => (kwBar.style.width = r.kw.pct + "%"), 30) : (kwBar.style.width = r.kw.pct + "%");
   } else $("skills").innerHTML = `<div class="no-jd" style="margin-top:10px">${t.noJd}</div>`;
@@ -1310,7 +1368,7 @@ function render(r, animate) {
   else if (!r.reqs.length) $("reqs").innerHTML = `<div class="no-jd" style="margin-top:10px">${t.noReq}</div>`;
   else $("reqs").innerHTML = `<div style="margin-top:8px">` + r.reqs.map((q) => {
     const d = t.req[q.id];
-    const p = { ...q.p, name: q.p.key ? t.langNames[q.p.key] : "" };
+    const p = { ...q.p, name: q.p.key ? t.langNames[q.p.key] : "", adN: t.langNames[q.p.ad], cvN: t.langNames[q.p.cv] };
     return `<div class="req"><div><strong>${esc(d.t(p))}</strong><p>${esc(d[q.status](p))}</p></div><span class="pill ${q.status}">${t.pill[q.status]}</span></div>`;
   }).join("") + `</div>`;
 
