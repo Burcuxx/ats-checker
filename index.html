@@ -3,8 +3,9 @@
 <head>
 <meta charset="utf-8" />
 <!-- Gizlilik güvencesi: sayfa cdnjs dışında hiçbir sunucuya bağlanamaz, form gönderemez, veri yükleyemez.
-     (connect-src yalnızca sitenin kendisine ve imzalı kütüphaneler için cdnjs'e izin verir; GitHub Pages statik bir sunucudur, veri kabul etmez.) -->
-<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'unsafe-inline' https://cdnjs.cloudflare.com; style-src 'unsafe-inline'; img-src 'self' data: blob:; connect-src 'self' https://cdnjs.cloudflare.com; worker-src blob:; base-uri 'none'; form-action 'none'; object-src 'none'" />
+     (connect-src: sitenin kendisi, imzalı kütüphaneler için cdnjs ve yalnızca ziyaretçi çerezleri kabul ederse Google Analytics.
+     CV içeriği hiçbir zaman gönderilmez.) -->
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'unsafe-inline' https://cdnjs.cloudflare.com https://www.googletagmanager.com; style-src 'unsafe-inline'; img-src 'self' data: blob: https://*.google-analytics.com https://*.googletagmanager.com; connect-src 'self' https://cdnjs.cloudflare.com https://*.google-analytics.com https://*.analytics.google.com https://www.googletagmanager.com; worker-src blob:; base-uri 'none'; form-action 'none'; object-src 'none'" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>Free ATS CV Checker &amp; Resume Scanner | Check Your CV Online</title>
 <meta name="description" content="Free ATS CV checker and resume scanner. Upload your CV to get an ATS score, a prioritised list of fixes, weak bullets to rewrite and keyword matching against the job ad. Runs in your browser; your file is never uploaded." />
@@ -13,6 +14,7 @@
 <link rel="alternate" hreflang="tr" href="https://burcuxx.github.io/ats-checker/?lang=tr" />
 <link rel="alternate" hreflang="x-default" href="https://burcuxx.github.io/ats-checker/" />
 <meta name="robots" content="index, follow" />
+<meta name="google-site-verification" content="uUaS4BZwlAY_aWEUckw8NcOovejV74Kpla5rJY9CVew" />
 <link rel="icon" type="image/svg+xml" href="favicon.svg" />
 <link rel="apple-touch-icon" href="apple-touch-icon.png" />
 <meta name="theme-color" content="#4f46e5" />
@@ -58,7 +60,8 @@
         { "@type": "Question", "name": "Is my CV uploaded to a server?", "acceptedAnswer": { "@type": "Answer", "text": "No. Your file is processed entirely in your browser and is never sent anywhere." } },
         { "@type": "Question", "name": "What is an ATS?", "acceptedAnswer": { "@type": "Answer", "text": "An Applicant Tracking System is software companies use to collect applications, extract information from CVs and search for candidates. Workday, Greenhouse and Lever are common examples." } },
         { "@type": "Question", "name": "How is the score calculated?", "acceptedAnswer": { "@type": "Answer", "text": "Checks such as readability, layout, sections and contact details are scored by weight. Bullets are scored proportionally. If you add a job ad, keyword match makes up 30% of the score." } },
-        { "@type": "Question", "name": "Should I send a PDF or a Word file?", "acceptedAnswer": { "@type": "Answer", "text": "Both work in most ATS. What matters is that the PDF contains real text (not a scan) and uses a simple single-column layout." } }
+        { "@type": "Question", "name": "Should I send a PDF or a Word file?", "acceptedAnswer": { "@type": "Answer", "text": "Both work in most ATS. What matters is that the PDF contains real text (not a scan) and uses a simple single-column layout." } },
+        { "@type": "Question", "name": "Do you use cookies?", "acceptedAnswer": { "@type": "Answer", "text": "Only if you accept them. With your consent we use Google Analytics to count visits and how often the checker is used. Your CV and the job ad are never sent anywhere." } }
       ]
     }
   ]
@@ -300,7 +303,21 @@ pre { white-space: pre-wrap; word-break: break-word; max-height: 420px; overflow
 .faq p { margin: 10px 0 0; color: var(--muted); font-size: 14px; }
 .fade { animation: f .45s ease both; }
 @keyframes f { from { opacity: 0; transform: translateY(8px); } }
-footer { text-align: center; color: var(--faint); font-size: 12px; padding: 40px 0 32px; }
+footer { text-align: center; color: var(--faint); font-size: 12px; padding: 40px 16px 32px; }
+.link-btn { font: inherit; color: var(--muted); background: none; border: 0; padding: 0; text-decoration: underline; text-underline-offset: 2px; cursor: pointer; }
+.link-btn:hover { color: var(--text); }
+/* Çerez onayı: sayfanın altında kart; sabit konumlu olduğu için sayfa kaymaz */
+.consent { position: fixed; z-index: 40; left: 16px; right: 16px; bottom: 16px; margin: 0 auto; max-width: 640px; display: flex; gap: 16px; align-items: center; background: var(--card); border: 1px solid var(--border); border-radius: 16px; padding: 16px 18px; box-shadow: 0 16px 40px rgba(10,14,40,.22); animation: consentIn .35s var(--ease, ease) both; }
+.consent[hidden] { display: none; }
+@keyframes consentIn { from { opacity: 0; transform: translateY(16px); } }
+.consent-text { flex: 1; min-width: 0; }
+.consent-text strong { display: block; font-size: 14px; margin-bottom: 2px; }
+.consent-text p { margin: 0; font-size: 13px; color: var(--muted); }
+.consent-actions { display: flex; gap: 8px; flex: none; }
+/* Reddet ve Kabul et eşit ağırlıkta (AB kuralı: reddetmek kabul etmek kadar kolay olmalı) */
+.consent-btn { font: inherit; font-size: 14px; font-weight: 600; border-radius: 10px; padding: 9px 16px; cursor: pointer; border: 1px solid var(--border); background: var(--bg-2); color: var(--text); }
+.consent-btn:hover { border-color: color-mix(in srgb, var(--accent) 45%, var(--border)); }
+@media (max-width: 560px) { .consent { flex-direction: column; align-items: stretch; } .consent-actions .consent-btn { flex: 1; } }
 
 /* =========================================================
    Hareket: geçişler ve basit animasyonlar (yalnızca transform/opacity → kayma yok, hızlı)
@@ -364,7 +381,7 @@ details.raw[open] summary::after, .faq details[open] summary::after { content: "
 
 @media print {
   body { background: #fff; }
-  .topbar, .nav, .prefs, .hero, #inputCard, .report, .info-sec, .faq-sec, footer { display: none !important; }
+  .topbar, .nav, .prefs, .consent, .hero, #inputCard, .report, .info-sec, .faq-sec, footer { display: none !important; }
   .card { box-shadow: none; break-inside: avoid; }
 }
 </style>
@@ -538,12 +555,23 @@ details.raw[open] summary::after, .faq details[open] summary::after { content: "
         <details><summary data-i18n="q3">What is an ATS?</summary><p data-i18n="a3">An Applicant Tracking System is software companies use to collect applications, extract information from CVs and search for candidates. Workday, Greenhouse and Lever are common examples.</p></details>
         <details><summary data-i18n="q4">How is the score calculated?</summary><p data-i18n="a4">Checks such as readability, layout, sections and contact details are scored by weight. Bullets are scored proportionally: if half your bullets have no number, you get half the points for that check. If you add a job ad, keyword match makes up 30% of the score. Scores differ between tools because each uses its own criteria.</p></details>
         <details><summary data-i18n="q5">Should I send a PDF or a Word file?</summary><p data-i18n="a5">Both work in most ATS. What matters is that the PDF contains real text (not a scan) and uses a simple single-column layout.</p></details>
+        <details><summary data-i18n="q6">Do you use cookies?</summary><p data-i18n="a6">Only if you accept them. With your consent we use Google Analytics to count visits and how often the checker is used. Your CV and the job ad are never sent to Google or anywhere else. You can change your choice any time via Cookie settings at the bottom of the page.</p></details>
       </div>
     </div>
   </section>
   </main>
 </div>
-<footer data-i18n="footer">Results are guidance only; every ATS works differently.</footer>
+<footer><span data-i18n="footer">Results are guidance only; every ATS works differently.</span> · <button type="button" class="link-btn" id="cookieSettings" data-i18n="cookieSettings">Cookie settings</button></footer>
+<div class="consent" id="consent" role="region" aria-labelledby="consentTitle" hidden>
+  <div class="consent-text">
+    <strong id="consentTitle" data-i18n="consentT">Cookies</strong>
+    <p data-i18n="consentP">With your consent we use Google Analytics cookies to see how the site is used. Your CV and the job ad are never sent anywhere.</p>
+  </div>
+  <div class="consent-actions">
+    <button type="button" class="consent-btn" id="consentReject" data-i18n="consentReject">Reject</button>
+    <button type="button" class="consent-btn" id="consentAccept" data-i18n="consentAccept">Accept</button>
+  </div>
+</div>
 
 <script>
 /* =========================================================
@@ -552,6 +580,10 @@ details.raw[open] summary::after, .faq details[open] summary::after { content: "
 const I18N = {
   tr: {
     brand: "ATS Kontrol",
+    cookieSettings: "Çerez ayarları", consentT: "Çerezler",
+    consentP: "Onay verirseniz sitenin nasıl kullanıldığını görmek için Google Analytics çerezleri kullanıyoruz. CV'niz ve iş ilanı hiçbir yere gönderilmez.",
+    consentReject: "Reddet", consentAccept: "Kabul et",
+    q6: "Çerez kullanıyor musunuz?", a6: "Yalnızca kabul ederseniz. Onay verirseniz ziyaretleri ve aracın ne sıklıkla kullanıldığını saymak için Google Analytics kullanıyoruz. CV'niz ve iş ilanı Google'a ya da başka bir yere asla gönderilmez. Seçiminizi istediğiniz zaman sayfanın altındaki Çerez ayarları'ndan değiştirebilirsiniz.",
     prefsT: "Tercihler", themeT: "Tema", themeSystem: "Sistem", themeLight: "Açık", themeDark: "Koyu", langT: "Dil",
     metaTitle: "Ücretsiz ATS CV Kontrolü ve Özgeçmiş Tarayıcı | CV'nizi Online Kontrol Edin",
     metaDesc: "Ücretsiz ATS CV kontrol aracı. CV'nizi yükleyin; ATS puanı, öncelikli düzeltme listesi, güçlendirilecek maddeler ve iş ilanıyla anahtar kelime eşleşmesi alın. Dosyanız tarayıcınızdan çıkmaz.",
@@ -613,7 +645,7 @@ const I18N = {
     langDiff: "İlan ve CV'niz farklı dillerde; teknik terimler dışındaki eşleşmeler kaçabilir.",
     req: {
       years: { t: (p) => `En az ${p.need} yıl deneyim`, ok: (p) => `CV'nizdeki tarihlere göre yaklaşık ${p.have} yıl deneyim.`, miss: (p) => `CV'nizdeki tarihlere göre yaklaşık ${p.have} yıl deneyim görünüyor.`, unknown: () => "CV'nizden deneyim süresi hesaplanamadı. Tarihleri \"03/2021 – 05/2024\" biçiminde yazın." },
-      degree: { t: (p) => ({ 1: "Lisans derecesi", 2: "Yüksek lisans derecesi", 3: "Doktora derecesi" })[p.need], ok: () => "CV'nizde bu seviyede eğitim bulundu.", miss: () => "CV'nizde bu seviyede eğitim bulunamadı." },
+      degree: { t: (p) => ({ 0.5: "Ön lisans derecesi", 1: "Lisans derecesi", 2: "Yüksek lisans derecesi", 3: "Doktora derecesi" })[p.need], ok: () => "CV'nizde bu seviyede eğitim bulundu.", miss: () => "CV'nizde bu seviyede eğitim bulunamadı." },
       lang: { t: (p) => `${p.name} dil bilgisi`, ok: () => "CV'nizde geçiyor.", miss: () => "CV'nizde bulunamadı. Varsa seviyesiyle birlikte ekleyin (ör. İngilizce – C1)." },
       license: { t: () => "Sürücü belgesi", ok: () => "CV'nizde geçiyor.", miss: () => "CV'nizde bulunamadı. Varsa sınıfıyla ekleyin (ör. B sınıfı ehliyet)." },
       adLang: { t: (p) => `İlan ${p.adN} yazılmış, CV'niz ${p.cvN}`,
@@ -691,6 +723,10 @@ const I18N = {
 
   en: {
     brand: "ATS Checker",
+    cookieSettings: "Cookie settings", consentT: "Cookies",
+    consentP: "With your consent we use Google Analytics cookies to see how the site is used. Your CV and the job ad are never sent anywhere.",
+    consentReject: "Reject", consentAccept: "Accept",
+    q6: "Do you use cookies?", a6: "Only if you accept them. With your consent we use Google Analytics to count visits and how often the checker is used. Your CV and the job ad are never sent to Google or anywhere else. You can change your choice any time via Cookie settings at the bottom of the page.",
     prefsT: "Preferences", themeT: "Theme", themeSystem: "System", themeLight: "Light", themeDark: "Dark", langT: "Language",
     metaTitle: "Free ATS CV Checker & Resume Scanner | Check Your CV Online",
     metaDesc: "Free ATS CV checker and resume scanner. Upload your CV to get an ATS score, a prioritised list of fixes, weak bullets to rewrite and keyword matching against the job ad. Runs in your browser; your file is never uploaded.",
@@ -752,7 +788,7 @@ const I18N = {
     langDiff: "The ad and your CV are in different languages, so non-technical matches may be missed.",
     req: {
       years: { t: (p) => `At least ${p.need} years of experience`, ok: (p) => `About ${p.have} years based on the dates in your CV.`, miss: (p) => `Your CV dates show about ${p.have} years.`, unknown: () => "Couldn't work out your experience from the CV. Write dates like \"03/2021 – 05/2024\"." },
-      degree: { t: (p) => ({ 1: "Bachelor's degree", 2: "Master's degree", 3: "PhD" })[p.need], ok: () => "A degree at this level was found in your CV.", miss: () => "No degree at this level was found in your CV." },
+      degree: { t: (p) => ({ 0.5: "Associate degree", 1: "Bachelor's degree", 2: "Master's degree", 3: "PhD" })[p.need], ok: () => "A degree at this level was found in your CV.", miss: () => "No degree at this level was found in your CV." },
       lang: { t: (p) => `${p.name} language skills`, ok: () => "Mentioned in your CV.", miss: () => "Not found in your CV. If you have it, add it with your level (e.g. German – B2)." },
       license: { t: () => "Driving licence", ok: () => "Mentioned in your CV.", miss: () => "Not found in your CV. If you have one, add it." },
       adLang: { t: (p) => `The ad is in ${p.adN}, your CV is in ${p.cvN}`,
@@ -850,7 +886,7 @@ function lockTextHeights() {
   if (!i18nBlocks) {
     const set = new Set();
     document.querySelectorAll("[data-i18n]").forEach((el) => {
-      if (el.closest("#results, .prefs, .nav")) return;
+      if (el.closest("#results, .prefs, .nav, .consent, footer")) return;
       // Kart içindeki satırlar tek tek değil, kartın tamamı sabitlenir (içerik ortalandığı için boşluk dengeli kalır)
       const card = el.closest(".hero-box");
       const block = card || (getComputedStyle(el).display.startsWith("inline") ? el.parentElement : el);
@@ -934,6 +970,46 @@ $("lang").addEventListener("click", (e) => {
   document.body.classList.remove("lang-swap"); void document.body.offsetWidth; document.body.classList.add("lang-swap");
   applyI18n();
 });
+
+/* =========================================================
+   Google Analytics (GA4) — yalnızca ziyaretçi "Kabul et" derse yüklenir.
+   Onay yokken Google'a hiçbir istek gitmez. CV ve ilan içeriği asla gönderilmez.
+   ========================================================= */
+const GA_ID = "G-9NHKMPF2E1"; // GA4 Ölçüm Kimliği (ATS CV Checker mülkü); boşsa Analytics hiç yüklenmez
+let CONSENT = null;
+try { CONSENT = localStorage.getItem("ats-consent"); } catch (e) {}
+function loadGA() {
+  if (!GA_ID || window.gtag) return;
+  window.dataLayer = window.dataLayer || [];
+  window.gtag = function () { dataLayer.push(arguments); };
+  gtag("consent", "default", { analytics_storage: "granted", ad_storage: "denied", ad_user_data: "denied", ad_personalization: "denied" });
+  gtag("js", new Date());
+  gtag("config", GA_ID, { anonymize_ip: true });
+  const sc = document.createElement("script");
+  sc.async = true;
+  sc.src = "https://www.googletagmanager.com/gtag/js?id=" + GA_ID;
+  document.head.appendChild(sc);
+}
+function track(name, params) { if (CONSENT === "granted" && window.gtag) gtag("event", name, params || {}); }
+function setConsent(v) {
+  CONSENT = v;
+  try { localStorage.setItem("ats-consent", v); } catch (e) {}
+  $("consent").hidden = true;
+  if (v === "granted") loadGA();
+  else {
+    if (window.gtag) gtag("consent", "update", { analytics_storage: "denied" });
+    // Daha önce oluşmuş Analytics çerezlerini sil
+    document.cookie.split(";").map((c) => c.trim().split("=")[0]).filter((n) => /^_ga/.test(n)).forEach((n) => {
+      const host = location.hostname;
+      [host, "." + host, ""].forEach((d) => (document.cookie = `${n}=; Max-Age=0; path=/;${d ? " domain=" + d + ";" : ""}`));
+    });
+  }
+}
+$("consentAccept").addEventListener("click", () => setConsent("granted"));
+$("consentReject").addEventListener("click", () => setConsent("denied"));
+$("cookieSettings").addEventListener("click", () => { $("consent").hidden = false; $("consentReject").focus(); });
+if (CONSENT === "granted") loadGA();
+else if (CONSENT !== "denied") setTimeout(() => ($("consent").hidden = false), 600); // ilk izlenimi bölmesin diye kısa gecikme
 
 /* Sticky header: sayfa kaydırılınca alt çizgi */
 const onScroll = () => $("topbar").classList.toggle("scrolled", scrollY > 4);
@@ -1044,6 +1120,8 @@ $("run").addEventListener("click", async () => {
       ? await extract(currentFile)
       : { name: "", size: 0, ext: "txt", pasted: true, text: $("cvText").value, pages: null };
     lastResult = analyze(doc, $("jd").value);
+    // Anonim kullanım olayı: yalnızca dosya türü, ilan var/yok ve puan aralığı (içerik yok)
+    track("cv_analyzed", { file_type: doc.pasted ? "pasted" : doc.ext, has_job_ad: !!lastResult.kw, score_band: Math.floor(lastResult.score / 10) * 10 });
     render(lastResult, true);
   } catch (err) {
     console.error(err);
@@ -1303,12 +1381,23 @@ function experienceYears(lines) {
   return Math.round((total / 12) * 10) / 10;
 }
 
-function degreeLevel(l) {
-  if (/doktora|ph\.?\s?d/.test(l)) return 3;
-  if (/yuksek lisans|yüksek lisans|master|m\.?sc|mba\b/.test(l)) return 2;
-  if (/(^|[^n] )lisans|bachelor|b\.?sc|b\.?a\.|üniversite|university|degree|mezun|mühendisliği|fakültesi/.test(l)) return 1;
-  return 0;
+/* Eğitim seviyeleri: 3 doktora, 2 yüksek lisans, 1 lisans.
+   Yalnızca derece ifadeleri sayılır: "Master.dev", "Scrum Master", "mastering" gibi kelimeler derece değildir. */
+const DEGREE_RE = [
+  [3, /(\bdoktora|\bph\.?\s?d\b|\bdoctorate\b|\bdoctoral\b)/],
+  [2, /(y[uü]ksek lisans|\bmaster'?s?\s+(degree|of|in)\b|\bmasters\s+(degree|of|in)\b|\bm\.?sc\b|\bm\.?eng\b|\bmba\b|\bm\.a\.|\bmaster'?s\b(?!\.))/],
+  [0.5, /((^|[^\p{L}])ön ?lisans|\bonlisans|\bassociate'?s? degree|\bassociate of)/u],
+  [1, /((?<!y[uü]ksek )(?<!ön )\blisans\b|\bbachelor|\bb\.?sc\b|\bb\.?eng\b|\bb\.a\.|\bba\s+(degree|in|\()|\bundergraduate degree\b)/],
+];
+const GENERIC_DEGREE = /(üniversite|university|\bdegree\b|mezun|mühendisliği|fakültesi)/;
+function degreeLevels(l) {
+  const found = DEGREE_RE.filter(([, re]) => re.test(l)).map(([lvl]) => lvl);
+  return { found, generic: GENERIC_DEGREE.test(l) };
 }
+// CV: sahip olunan en yüksek seviye. Belirli bir derece yoksa "üniversite" gibi genel ifade lisans sayılır.
+function cvDegree(l) { const d = degreeLevels(l); return d.found.length ? Math.max(...d.found) : d.generic ? 1 : 0; }
+// İlan: istenen en düşük seviye ("Bachelor's or Master's" → lisans yeterli)
+function jdDegree(l) { const d = degreeLevels(l); return d.found.length ? Math.min(...d.found) : d.generic ? 1 : 0; }
 
 /* Diller: Türkçe ad, İngilizce ad ve dilin kendi adı (kelime sınırıyla aranır) */
 const LANGS = {
@@ -1382,8 +1471,8 @@ function requirements(jd, cvLower, sections, cvLang, cvText) {
     out.push({ id: "years", p: { need, have }, status: have == null ? "unknown" : have + 0.25 >= need ? "ok" : "miss" });
   }
   // Eğitim
-  const need = degreeLevel(j);
-  if (need) out.push({ id: "degree", p: { need }, status: degreeLevel(cvLower) >= need ? "ok" : "miss" });
+  const need = jdDegree(j);
+  if (need) out.push({ id: "degree", p: { need }, status: cvDegree(cvLower) >= need ? "ok" : "miss" });
   // Diller
   const jdLang = detectLang(jd);
   for (const [k, keys] of Object.entries(LANGS)) {
