@@ -3,3 +3,6 @@ cv-onizleme/
 *.png
 .claude/
 .DS_Store
+
+# Uygulama ikonu yayınlanır
+!apple-touch-icon.png
