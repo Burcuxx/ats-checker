@@ -155,6 +155,7 @@ textarea:focus { border-color: var(--accent); box-shadow: 0 0 0 3px var(--accent
 .chips { display: flex; flex-wrap: wrap; gap: 6px; }
 .chip { padding: 4px 11px; border-radius: 999px; font-size: 13px; font-weight: 500; }
 .chip.miss { background: var(--bad-soft); color: var(--bad); } .chip.hit { background: var(--ok-soft); color: var(--ok); }
+.chip.other { background: var(--bg-2); color: var(--muted); border: 1px solid var(--border); } .chip.other.in { color: var(--text); }
 .req { display: grid; grid-template-columns: 1fr auto; gap: 12px; align-items: center; padding: 12px 0; border-top: 1px solid var(--border); }
 .req:first-of-type { border-top: 0; }
 .req strong { display: block; font-size: 14px; }
@@ -403,9 +404,10 @@ const I18N = {
     },
     tipLabel: "Öneri:",
     skillsT: "İlandaki beceriler",
-    skillsS: "İlanda öne çıkan terimlerin CV'nizde geçme oranı.",
+    skillsS: "İlanda geçen bilinen becerilerin CV'nizde geçme oranı.",
     missing: "Eksik", found: "Bulunan",
-    noMissing: "Eksik kelime yok.", noFound: "Eşleşen kelime yok.",
+    noMissing: "Eksik beceri yok.", noFound: "Eşleşen beceri yok.",
+    otherT: "İlandaki diğer terimler", otherS: "Puana katılmaz. İlanda büyük harfle geçen ürün, araç veya şirket adları; aralarında beceri varsa ve sizde de varsa CV'nize ekleyin. ✓ CV'nizde geçenleri gösterir.",
     reqT: "İlandaki gereksinimler",
     noJd: "Beceri ve gereksinim karşılaştırması için yukarıya bir iş ilanı yapıştırın.",
     noReq: "İlanda deneyim süresi, eğitim, dil veya ehliyet gibi belirgin bir gereksinim bulunamadı.",
@@ -532,9 +534,10 @@ const I18N = {
     },
     tipLabel: "Tip:",
     skillsT: "Skills from the advert",
-    skillsS: "How many of the ad's key terms appear in your CV.",
+    skillsS: "How many of the known skills in the ad appear in your CV.",
     missing: "Missing", found: "Found",
-    noMissing: "No missing terms.", noFound: "No matching terms.",
+    noMissing: "No missing skills.", noFound: "No matching skills.",
+    otherT: "Other terms in the ad", otherS: "Not scored. Capitalised product, tool or company names from the ad; if any is a skill you have, add it to your CV. ✓ marks ones already in your CV.",
     reqT: "Requirements from the advert",
     noJd: "Paste a job ad above to compare skills and requirements.",
     noReq: "No clear requirements (years of experience, degree, language, licence) found in the ad.",
@@ -1106,7 +1109,9 @@ const STOP = new Set((
   "across closely help helping make making build building well also other new more most best like based level high " +
   "company product products users user business customers clients client day days part full time remote hybrid office " +
   "solutions solution development experiences services service organizations organization improvement improvements " +
-  "potential partner innovative challengers digital creativity technology strategy agency trust approach methodologies "
+  "potential partner innovative challengers digital creativity technology strategy agency trust approach methodologies " +
+  "senior junior lead principal staff mid frontend front-end backend back-end fullstack full-stack engineer engineers developer developers " +
+  "manager specialist core team teams we our you your requirements responsibilities qualifications offer benefits "
 ).split(" ").map(fold));
 
 /* Bilinen beceriler: ilanda bir kez geçse bile anahtar kelime sayılır.
@@ -1114,7 +1119,7 @@ const STOP = new Set((
 const SKILLS = `
 javascript|javascript,es6 ; typescript|typescript ; react|react,react.js,reactjs ; react native ; next.js|next.js,nextjs ;
 vue|vue,vue.js,vuejs ; angular ; svelte ; node.js|node.js,nodejs,node ; express|express,express.js ; html|html,html5 ; css|css,css3 ;
-sass|sass,scss ; tailwind|tailwind,tailwindcss ; bootstrap ; redux ; zustand ; graphql ; rest api|rest api,rest apis,restful ;
+sass|sass,scss ; tailwind|tailwind,tailwindcss ; bootstrap ; redux ; zustand ; graphql ; rest api|rest api,rest apis,restful ; api|api,apis ;
 jquery ; webpack ; vite ; babel ; jest ; vitest ; cypress ; playwright ; testing library ; unit testing|unit testing,unit tests,unit test ;
 e2e testing|e2e,end-to-end ; integration testing|integration testing,integration tests ; testing|testing,tests,test ;
 debugging|debugging,debug ; troubleshooting|troubleshooting,troubleshoot ; accessibility|accessibility,a11y,wcag ;
@@ -1129,6 +1134,19 @@ code review|code review,code reviews ; monorepo ; i18n|i18n,internationalization
 oauth ; jwt ; ux ; ui ; a/b testing|a/b testing,a/b tests,ab testing ; seo ; google analytics|google analytics,ga4 ;
 google tag manager|google tag manager,gtm ; semrush ; ahrefs ; screaming frog ; search console ; wordpress ; cms ; shopify ;
 hubspot ; salesforce ; excel ; power bi ; tableau ; machine learning ; data analysis ; project management ; stakeholder management ;
+contentful ; storyblok ; sanity ; strapi ; directus ; sitecore ; aem|aem,adobe experience manager ; umbraco ; drupal ; headless cms ;
+magento ; opencart ; woocommerce ; sap ; sharepoint ; dynamics 365 ; servicenow ; adobe xd ; sketch ; zeplin ; photoshop ; illustrator ;
+invision ; framer ; material ui|material ui,mui ; shadcn ; chakra ui ; styled-components|styled-components,styled components ; css modules ;
+emotion ; three.js ; d3.js|d3.js,d3 ; chart.js ; webgl ; svg ; animation|animation,animations ; framer motion ; gsap ;
+remix ; astro ; nuxt ; gatsby ; electron ; ionic ; capacitor ; expo ; react query|react query,tanstack query ; rxjs ; ngrx ; mobx ;
+nx ; turborepo ; pnpm ; yarn ; npm ; eslint ; prettier ; sonarqube ; sentry ; datadog ; new relic ; grafana ; terraform ;
+serverless ; lambda ; cloudflare ; nginx ; ssr|ssr,server-side rendering ; ssg|ssg,static site generation ; spa|spa,single-page application ;
+micro frontends|micro frontends,micro-frontends,microfrontends ; module federation ; web components ; seo optimization ;
+cross-browser|cross-browser,cross browser ; semantic html ; design tokens ; theming ; multi-brand|multi-brand,multi brand ;
+llm|llm,llms,large language models ; ai|ai,artificial intelligence ; copilot|copilot,github copilot ; cursor ; chatgpt ; claude ;
+gdpr ; owasp ; payments|payments,payment integration ; stripe ; igaming ; e-commerce|e-commerce,ecommerce ; fintech ; banking ;
+requirements analysis ; technical documentation|technical documentation,documentation ;
+product management ; user research ; usability testing ; wireframing|wireframing,wireframes ; prototyping|prototyping,prototypes ;
 proje yönetimi
 `.split(";").map((x) => x.trim()).filter(Boolean).map((x) => {
   const [name, alts] = x.split("|").map((y) => y.trim());
@@ -1157,27 +1175,44 @@ function matchKeywords(jd, cvLower) {
     const n = (jdF.match(new RegExp(reEsc(sk.alts[0]), "g")) || []).length;
     terms.push({ name: sk.name, alts: sk.alts, score: 10 + n });
   }
-  // 2) Diğer sık kelimeler: en az 2 kez geçenler (tek geçen sıradan kelimeleri ele)
-  const toks = tokenize(jd, detectLang(jd));
-  const freq = new Map();
-  toks.forEach((t) => freq.set(t, (freq.get(t) || 0) + 1));
-  for (let i = 0; i < toks.length - 1; i++) { const bi = toks[i] + " " + toks[i + 1]; freq.set(bi, (freq.get(bi) || 0) + 1); }
-  const ranked = [...freq.entries()]
-    .filter(([k, v]) => v >= 2 && k.length > 2)
-    .map(([k, v]) => [k, k.includes(" ") ? v * 1.5 : v])
-    .sort((a, b) => b[1] - a[1]);
-  for (const [k, v] of ranked) {
-    if (terms.length >= 30) break;
-    const f = fold(k);
-    if (terms.some((t) => t.alts.some((a) => a.includes(f) || f.includes(a)) || fold(t.name).includes(f) || f.includes(fold(t.name)))) continue;
-    terms.push({ name: k, alts: [f], score: v });
+  // 2) Sözlük az şey bulduysa (teknik olmayan ilanlar) en sık geçen kelimelerle tamamla
+  const covered = (f) => terms.some((t) => t.alts.some((a) => a.includes(f) || f.includes(a)) || fold(t.name).includes(f) || f.includes(fold(t.name)));
+  if (terms.length < 3) {
+    const toks = tokenize(jd, detectLang(jd));
+    const freq = new Map();
+    toks.forEach((t) => freq.set(t, (freq.get(t) || 0) + 1));
+    const ranked = [...freq.entries()].filter(([k, v]) => v >= 2 && k.length > 2).sort((a, b) => b[1] - a[1]);
+    for (const [k, v] of ranked) {
+      if (terms.length >= 15) break;
+      const f = fold(k);
+      if (!covered(f)) terms.push({ name: k, alts: [f], score: v });
+    }
   }
+  // 3) Puana katılmayan "diğer terimler": cümle ortasında büyük harfle yazılmış ürün/araç adları ve kısaltmalar
+  //    (ör. Storyblok, SAP, AEM). Sıradan kelimeler ("bank", "results") küçük harfle yazıldığı için elenir.
+  const langWords = new Set(Object.values(LANGS).flat());
+  const other = new Map();
+  for (const line of jd.split(/\n/)) {
+    const words = line.split(/\s+/);
+    for (let i = 0; i < words.length; i++) {
+      const clean = words[i].replace(/^[("'“‘]+|[)"'”’.,;:!?]+$/g, "");
+      if (/['’]s$/.test(clean)) continue; // "Nexer’s" → şirket adı
+      const raw = clean;
+      if (raw.length < 2 || !/^\p{Lu}/u.test(raw) && !/\d/.test(raw)) continue;
+      const prev = i ? words[i - 1] : "";
+      if (i === 0 || /[.!?:•–-]$/.test(prev)) continue; // cümle/madde başı
+      const f = fold(raw);
+      if (STOP.has(f) || langWords.has(f) || covered(f) || /^\d+$/.test(raw) || f.length < 2) continue;
+      other.set(raw, (other.get(raw) || 0) + 1);
+    }
+  }
+  const otherTerms = [...other.keys()].slice(0, 15).map((k) => ({ name: k, inCv: hasTerm(cvLower, fold(k)) }));
   terms.sort((a, b) => b.score - a.score);
   const picked = terms.slice(0, 30);
   // Türkçe ekler için: uzun tek kelimelerde ilk 5 harf yeterli
   const has = (t) => t.alts.some((a) => hasTerm(cvLower, a) || (a.length > 6 && !a.includes(" ") && cvLower.includes(a.slice(0, 5))));
   const found = picked.filter(has).map((t) => t.name), missing = picked.filter((t) => !has(t)).map((t) => t.name);
-  return { found, missing, pct: picked.length ? Math.round((found.length / picked.length) * 100) : 0 };
+  return { found, missing, other: otherTerms, pct: picked.length ? Math.round((found.length / picked.length) * 100) : 0 };
 }
 
 /* =========================================================
@@ -1260,7 +1295,9 @@ function render(r, animate) {
       <div class="kw-label" style="color:var(--bad)">${t.missing} (${r.kw.missing.length})</div>
       <div class="chips">${r.kw.missing.map((k) => `<span class="chip miss">${esc(k)}</span>`).join("") || `<span class="muted">${t.noMissing}</span>`}</div>
       <div class="kw-label" style="color:var(--ok)">${t.found} (${r.kw.found.length})</div>
-      <div class="chips">${r.kw.found.map((k) => `<span class="chip hit">${esc(k)}</span>`).join("") || `<span class="muted">${t.noFound}</span>`}</div>`;
+      <div class="chips">${r.kw.found.map((k) => `<span class="chip hit">${esc(k)}</span>`).join("") || `<span class="muted">${t.noFound}</span>`}</div>
+      ${r.kw.other && r.kw.other.length ? `<div class="kw-label">${t.otherT}</div><p class="muted" style="font-size:13px;margin-bottom:8px">${t.otherS}</p>
+      <div class="chips">${r.kw.other.map((o) => `<span class="chip other${o.inCv ? " in" : ""}">${esc(o.name)}${o.inCv ? " ✓" : ""}</span>`).join("")}</div>` : ""}`;
     const kwBar = $("skills").querySelector(".meter i");
     animate ? setTimeout(() => (kwBar.style.width = r.kw.pct + "%"), 30) : (kwBar.style.width = r.kw.pct + "%");
   } else $("skills").innerHTML = `<div class="no-jd" style="margin-top:10px">${t.noJd}</div>`;
