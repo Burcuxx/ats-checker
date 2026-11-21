@@ -12,4 +12,10 @@
     <xhtml:link rel="alternate" hreflang="tr" href="https://burcuxx.github.io/ats-checker/?lang=tr" />
     <lastmod>2026-11-20</lastmod>
   </url>
+  <url>
+    <loc>https://burcuxx.github.io/ats-checker/privacy.html</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="https://burcuxx.github.io/ats-checker/privacy.html" />
+    <xhtml:link rel="alternate" hreflang="tr" href="https://burcuxx.github.io/ats-checker/privacy.html?lang=tr" />
+    <lastmod>2026-11-21</lastmod>
+  </url>
 </urlset>

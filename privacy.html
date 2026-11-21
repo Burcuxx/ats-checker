@@ -1,0 +1,224 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'unsafe-inline'; style-src 'unsafe-inline'; img-src 'self' data:; connect-src 'self'; base-uri 'none'; form-action 'none'; object-src 'none'" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Privacy Policy | ATS CV Checker</title>
+<meta name="description" content="How ATS CV Checker handles your data: your CV is processed only in your browser and never uploaded. Google Analytics is used only with your consent." />
+<link rel="canonical" href="https://burcuxx.github.io/ats-checker/privacy.html" />
+<link rel="alternate" hreflang="en" href="https://burcuxx.github.io/ats-checker/privacy.html" />
+<link rel="alternate" hreflang="tr" href="https://burcuxx.github.io/ats-checker/privacy.html?lang=tr" />
+<link rel="alternate" hreflang="x-default" href="https://burcuxx.github.io/ats-checker/privacy.html" />
+<link rel="icon" type="image/svg+xml" href="favicon.svg" />
+<link rel="apple-touch-icon" href="apple-touch-icon.png" />
+<meta name="theme-color" content="#4f46e5" />
+<script>
+  // Ana sayfadaki tema ve dil tercihini uygula (sayfa çizilmeden)
+  try {
+    var t = localStorage.getItem("ats-theme");
+    if (t === "light" || t === "dark") document.documentElement.dataset.theme = t;
+  } catch (e) {}
+</script>
+<style>
+:root {
+  --bg: #f5f6fb; --bg-2: #eef0fa; --card: #ffffff; --text: #151a2d; --muted: #5d6580; --border: #e4e7f1;
+  --accent: #4f46e5; --accent-2: #7c3aed; --accent-soft: #eef0ff; --warn: #a1500a; --warn-soft: #fdf3e2;
+  color-scheme: light;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #0d1020; --bg-2: #12162a; --card: #161a2f; --text: #e9ecf8; --muted: #a3abc7; --border: #262b45;
+    --accent: #818cf8; --accent-2: #a78bfa; --accent-soft: #1e2246; --warn: #fbbf24; --warn-soft: #2d2412;
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #0d1020; --bg-2: #12162a; --card: #161a2f; --text: #e9ecf8; --muted: #a3abc7; --border: #262b45;
+  --accent: #818cf8; --accent-2: #a78bfa; --accent-soft: #1e2246; --warn: #fbbf24; --warn-soft: #2d2412;
+  color-scheme: dark;
+}
+* { box-sizing: border-box; }
+body { margin: 0; font: 16px/1.65 Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; color: var(--text); background: var(--bg); }
+.wrap { max-width: 760px; margin: 0 auto; padding: 0 16px; }
+.nav { display: flex; align-items: center; gap: 10px; padding: 18px 0; flex-wrap: wrap; }
+.brand { display: inline-flex; align-items: center; gap: 10px; font-weight: 800; letter-spacing: -.02em; font-size: 17px; color: var(--text); text-decoration: none; }
+.logo { width: 34px; height: 34px; border-radius: 10px; background: linear-gradient(135deg, var(--accent), var(--accent-2)); display: grid; place-items: center; color: #fff; }
+.lang { margin-left: auto; display: inline-flex; gap: 4px; background: var(--card); border: 1px solid var(--border); border-radius: 999px; padding: 3px; }
+.lang a { font-size: 12px; font-weight: 700; color: var(--muted); text-decoration: none; padding: 4px 10px; border-radius: 999px; }
+.lang a[aria-current="true"] { background: var(--accent); color: var(--bg); }
+article { background: var(--card); border: 1px solid var(--border); border-radius: 16px; padding: 28px; margin: 12px 0 32px; }
+h1 { font-size: clamp(28px, 5vw, 38px); line-height: 1.15; letter-spacing: -.02em; margin: 0 0 6px; }
+h2 { font-size: 20px; margin: 32px 0 8px; letter-spacing: -.01em; }
+p, li { color: var(--muted); }
+strong { color: var(--text); }
+a { color: var(--accent); }
+.updated { font-size: 14px; margin: 0 0 20px; }
+.summary { background: var(--accent-soft); border-radius: 12px; padding: 16px 18px; margin: 20px 0; }
+.summary p { margin: 0; color: var(--text); }
+.summary ul { margin: 8px 0 0; padding-left: 20px; }
+.summary li { color: var(--text); }
+table { width: 100%; border-collapse: collapse; font-size: 14px; margin: 10px 0; }
+th, td { text-align: left; padding: 10px 8px; border-top: 1px solid var(--border); vertical-align: top; }
+th { color: var(--text); font-weight: 600; }
+td { color: var(--muted); }
+.table-wrap { overflow-x: auto; }
+.todo { background: var(--warn-soft); color: var(--warn); font-weight: 700; padding: 1px 6px; border-radius: 6px; }
+.back { display: inline-block; margin: 8px 0 24px; font-weight: 600; text-decoration: none; }
+footer { text-align: center; color: var(--muted); font-size: 12px; padding: 0 16px 32px; }
+[hidden] { display: none !important; }
+@media (max-width: 560px) { article { padding: 20px; } }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <nav class="nav">
+    <a class="brand" href="./">
+      <span class="logo" aria-hidden="true"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg></span>
+      ATS Checker
+    </a>
+    <div class="lang" aria-label="Language">
+      <a href="?lang=en" data-l="en" lang="en">EN</a>
+      <a href="?lang=tr" data-l="tr" lang="tr">TR</a>
+    </div>
+  </nav>
+
+  <main>
+  <!-- ===================== ENGLISH ===================== -->
+  <article lang="en" data-lang="en">
+    <h1>Privacy Policy</h1>
+    <p class="updated">Last updated: 21 November 2026</p>
+
+    <div class="summary">
+      <p><strong>In short:</strong></p>
+      <ul>
+        <li>Your CV and the job ad are processed <strong>only in your browser</strong>. They are never uploaded, stored or seen by us or anyone else.</li>
+        <li>We use Google Analytics <strong>only if you accept cookies</strong>, to count visits and how often the checker is used.</li>
+        <li>You can change your cookie choice at any time via <strong>Cookie settings</strong> at the bottom of the main page.</li>
+      </ul>
+    </div>
+
+    <h2>1. Who is responsible</h2>
+    <p>The controller of this website (https://burcuxx.github.io/ats-checker/) is Burcu Ozcan, based in Malta. For any privacy question or request, contact <a href="mailto:burcukozcan@gmail.com">burcukozcan@gmail.com</a>.</p>
+
+    <h2>2. Your CV and the job ad</h2>
+    <p>When you upload a CV (PDF, DOCX or TXT), paste text or paste a job ad, all reading and analysis happens on your own device, inside your browser. The file and its contents are <strong>not sent to any server</strong>, not stored after you close or reload the page, and not shared with anyone. The site's security policy technically blocks it from sending data anywhere other than the services listed below.</p>
+    <p>To read PDF and Word files, your browser downloads two open-source libraries (pdf.js and mammoth.js) from cdnjs. These are code downloads only; your file is never sent to cdnjs.</p>
+
+    <h2>3. Information stored in your browser</h2>
+    <p>We save three settings in your browser's local storage so the site remembers them: your <strong>language</strong>, your <strong>theme</strong> (light/dark) and your <strong>cookie choice</strong>. They stay on your device, are never sent to us, and you can delete them by clearing your browser's site data.</p>
+
+    <h2>4. Google Analytics (only with your consent)</h2>
+    <p>If you click <strong>Accept</strong> in the cookie banner, we load Google Analytics 4, provided by Google Ireland Limited, Gordon House, Barrow Street, Dublin 4, Ireland. Before you accept, no request is made to Google.</p>
+    <p><strong>What is collected:</strong> pages viewed, approximate location (country/city, derived from your IP address, which Google Analytics 4 does not store), device and browser type, referring website, and one event when you run a check, containing only the file type, whether a job ad was added and the score range (for example "80–89"). <strong>No content from your CV or the job ad is ever sent.</strong></p>
+    <p><strong>Legal basis:</strong> your consent (Article 6(1)(a) GDPR). You can withdraw it at any time via Cookie settings; previously set analytics cookies are then deleted.</p>
+    <p><strong>Retention:</strong> Google Analytics keeps event data for 2 months, after which it is deleted automatically.</p>
+    <p><strong>Transfers outside the EU:</strong> Google may process data in the United States. Google LLC is certified under the EU–U.S. Data Privacy Framework. More information: <a href="https://policies.google.com/privacy" rel="noopener">Google Privacy Policy</a> and <a href="https://support.google.com/analytics/answer/6004245" rel="noopener">how Google Analytics safeguards data</a>.</p>
+
+    <h2>5. Cookies</h2>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>Name</th><th>Provider</th><th>Purpose</th><th>Duration</th></tr></thead>
+        <tbody>
+          <tr><td>_ga</td><td>Google Analytics</td><td>Distinguishes visitors (only after consent)</td><td>2 years</td></tr>
+          <tr><td>_ga_9NHKMPF2E1</td><td>Google Analytics</td><td>Keeps session state (only after consent)</td><td>2 years</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <p>No cookies are set if you reject or ignore the banner.</p>
+
+    <h2>6. Hosting and technical access logs</h2>
+    <p>The site is hosted on GitHub Pages (GitHub, Inc.) and libraries are delivered by cdnjs (Cloudflare, Inc.). Like any web server, they receive your IP address and browser information to deliver the page and protect against abuse. This processing is necessary to show you the website (legitimate interest, Article 6(1)(f) GDPR). See the <a href="https://docs.github.com/site-policy/privacy-policies/github-general-privacy-statement" rel="noopener">GitHub Privacy Statement</a> and the <a href="https://www.cloudflare.com/privacypolicy/" rel="noopener">Cloudflare Privacy Policy</a>.</p>
+
+    <h2>7. Your rights</h2>
+    <p>Under the GDPR you have the right to access, correct or delete your personal data, to restrict or object to its processing, to data portability, and to withdraw consent at any time. Because we do not receive your CV or any account data, most requests concern Google Analytics data; contact us at the address above. You also have the right to lodge a complaint with a supervisory authority. In Malta this is the <a href="https://idpc.org.mt" rel="noopener">Information and Data Protection Commissioner (IDPC)</a>.</p>
+
+    <h2>8. Children</h2>
+    <p>This site is not intended for children under 16 and we do not knowingly collect their data.</p>
+
+    <h2>9. Changes to this policy</h2>
+    <p>If we change how the site handles data, we will update this page and the date at the top.</p>
+
+    <a class="back" href="./">← Back to the CV checker</a>
+  </article>
+
+  <!-- ===================== TÜRKÇE ===================== -->
+  <article lang="tr" data-lang="tr" hidden>
+    <h1>Gizlilik Politikası</h1>
+    <p class="updated">Son güncelleme: 21 Kasım 2026</p>
+
+    <div class="summary">
+      <p><strong>Kısaca:</strong></p>
+      <ul>
+        <li>CV'niz ve iş ilanı <strong>yalnızca tarayıcınızda</strong> işlenir. Hiçbir yere yüklenmez, saklanmaz; ne biz ne de başkası görür.</li>
+        <li>Google Analytics'i <strong>yalnızca çerezleri kabul ederseniz</strong>, ziyaretleri ve aracın ne sıklıkla kullanıldığını saymak için kullanırız.</li>
+        <li>Çerez tercihinizi ana sayfanın altındaki <strong>Çerez ayarları</strong>'ndan istediğiniz zaman değiştirebilirsiniz.</li>
+      </ul>
+    </div>
+
+    <h2>1. Veri sorumlusu</h2>
+    <p>Bu web sitesinin (https://burcuxx.github.io/ats-checker/) veri sorumlusu Malta'da bulunan Burcu Ozcan'dır. Gizlilikle ilgili her türlü soru ve talep için: <a href="mailto:burcukozcan@gmail.com">burcukozcan@gmail.com</a>.</p>
+
+    <h2>2. CV'niz ve iş ilanı</h2>
+    <p>Bir CV yüklediğinizde (PDF, DOCX veya TXT), metin ya da iş ilanı yapıştırdığınızda tüm okuma ve analiz kendi cihazınızda, tarayıcınızın içinde yapılır. Dosya ve içeriği <strong>hiçbir sunucuya gönderilmez</strong>, sayfayı kapattığınızda veya yenilediğinizde saklanmaz ve kimseyle paylaşılmaz. Sitenin güvenlik politikası, aşağıda sayılan hizmetler dışında herhangi bir yere veri gönderilmesini teknik olarak engeller.</p>
+    <p>PDF ve Word dosyalarını okumak için tarayıcınız cdnjs'den iki açık kaynak kütüphane (pdf.js ve mammoth.js) indirir. Bu yalnızca kod indirmesidir; dosyanız cdnjs'e gönderilmez.</p>
+
+    <h2>3. Tarayıcınızda saklanan bilgiler</h2>
+    <p>Site tercihlerinizi hatırlasın diye tarayıcınızın yerel depolama alanına üç ayar kaydedilir: <strong>dil</strong>, <strong>tema</strong> (açık/koyu) ve <strong>çerez tercihiniz</strong>. Bunlar cihazınızda kalır, bize gönderilmez; tarayıcınızın site verilerini temizleyerek silebilirsiniz.</p>
+
+    <h2>4. Google Analytics (yalnızca onayınızla)</h2>
+    <p>Çerez bildiriminde <strong>Kabul et</strong>'e tıklarsanız Google Ireland Limited (Gordon House, Barrow Street, Dublin 4, İrlanda) tarafından sağlanan Google Analytics 4 yüklenir. Kabul etmeden önce Google'a hiçbir istek gönderilmez.</p>
+    <p><strong>Toplanan bilgiler:</strong> görüntülenen sayfalar, yaklaşık konum (IP adresinizden çıkarılan ülke/şehir; Google Analytics 4 IP adresini saklamaz), cihaz ve tarayıcı türü, siteye geldiğiniz kaynak ve bir kontrol yaptığınızda yalnızca dosya türünü, ilan eklenip eklenmediğini ve puan aralığını (ör. "80–89") içeren tek bir olay. <strong>CV'nizden veya iş ilanından hiçbir içerik gönderilmez.</strong></p>
+    <p><strong>Hukuki dayanak:</strong> açık rızanız (GDPR Madde 6(1)(a)). Rızanızı Çerez ayarları'ndan istediğiniz zaman geri alabilirsiniz; daha önce oluşturulan analiz çerezleri silinir.</p>
+    <p><strong>Saklama süresi:</strong> Google Analytics olay verilerini 2 ay saklar, ardından otomatik olarak siler.</p>
+    <p><strong>AB dışına aktarım:</strong> Google verileri Amerika Birleşik Devletleri'nde işleyebilir. Google LLC, AB–ABD Veri Gizliliği Çerçevesi kapsamında sertifikalıdır. Ayrıntılar: <a href="https://policies.google.com/privacy?hl=tr" rel="noopener">Google Gizlilik Politikası</a> ve <a href="https://support.google.com/analytics/answer/6004245?hl=tr" rel="noopener">Google Analytics'in verileri nasıl koruduğu</a>.</p>
+
+    <h2>5. Çerezler</h2>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>Ad</th><th>Sağlayıcı</th><th>Amaç</th><th>Süre</th></tr></thead>
+        <tbody>
+          <tr><td>_ga</td><td>Google Analytics</td><td>Ziyaretçileri ayırt eder (yalnızca onaydan sonra)</td><td>2 yıl</td></tr>
+          <tr><td>_ga_9NHKMPF2E1</td><td>Google Analytics</td><td>Oturum durumunu tutar (yalnızca onaydan sonra)</td><td>2 yıl</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <p>Bildirimi reddederseniz ya da yanıtlamazsanız hiçbir çerez oluşturulmaz.</p>
+
+    <h2>6. Barındırma ve teknik erişim kayıtları</h2>
+    <p>Site GitHub Pages (GitHub, Inc.) üzerinde barındırılır; kütüphaneler cdnjs (Cloudflare, Inc.) üzerinden sunulur. Her web sunucusu gibi bu hizmetler de sayfayı size ulaştırmak ve kötüye kullanıma karşı korumak için IP adresinizi ve tarayıcı bilgilerinizi alır. Bu işleme, siteyi gösterebilmek için gereklidir (meşru menfaat, GDPR Madde 6(1)(f)). Bkz. <a href="https://docs.github.com/site-policy/privacy-policies/github-general-privacy-statement" rel="noopener">GitHub Gizlilik Bildirimi</a> ve <a href="https://www.cloudflare.com/privacypolicy/" rel="noopener">Cloudflare Gizlilik Politikası</a>.</p>
+
+    <h2>7. Haklarınız</h2>
+    <p>GDPR kapsamında kişisel verilerinize erişme, düzeltilmesini veya silinmesini isteme, işlenmesini kısıtlama veya itiraz etme, veri taşınabilirliği ve rızanızı istediğiniz zaman geri alma haklarına sahipsiniz. CV'nizi veya herhangi bir hesap verisini almadığımız için taleplerin çoğu Google Analytics verileriyle ilgilidir; yukarıdaki adresten bize ulaşabilirsiniz. Ayrıca bir denetim makamına şikâyette bulunma hakkınız vardır. Malta'da bu makam <a href="https://idpc.org.mt" rel="noopener">Information and Data Protection Commissioner (IDPC)</a>'dır.</p>
+
+    <h2>8. Çocuklar</h2>
+    <p>Bu site 16 yaşından küçükler için tasarlanmamıştır ve bilerek onlardan veri toplamayız.</p>
+
+    <h2>9. Bu politikadaki değişiklikler</h2>
+    <p>Sitenin verileri işleme biçimi değişirse bu sayfayı ve en üstteki tarihi güncelleriz.</p>
+
+    <a class="back" href="./?lang=tr">← CV kontrol aracına dön</a>
+  </article>
+  </main>
+</div>
+<footer>ATS CV Checker · <a href="./">burcuxx.github.io/ats-checker</a></footer>
+
+<script>
+  // Dil: ?lang=tr / ?lang=en > ana sayfada kayıtlı tercih > İngilizce
+  (function () {
+    var lang = "en";
+    try { lang = localStorage.getItem("ats-lang") || "en"; } catch (e) {}
+    var q = new URLSearchParams(location.search).get("lang");
+    if (q === "tr" || q === "en") lang = q;
+    document.documentElement.lang = lang;
+    document.querySelectorAll("article[data-lang]").forEach(function (a) { a.hidden = a.dataset.lang !== lang; });
+    document.querySelectorAll(".lang a").forEach(function (a) { a.setAttribute("aria-current", String(a.dataset.l === lang)); });
+    document.querySelector(".brand").href = lang === "tr" ? "./?lang=tr" : "./";
+    if (lang === "tr") {
+      document.title = "Gizlilik Politikası | ATS CV Checker";
+      document.querySelector('link[rel="canonical"]').href = "https://burcuxx.github.io/ats-checker/privacy.html?lang=tr";
+    }
+  })();
+</script>
+</body>
+</html>
